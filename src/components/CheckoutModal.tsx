@@ -18,7 +18,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 }) => {
   if (!isOpen) return null;
 
-  const [paymentMethod, setPaymentMethod] = useState<'mada' | 'apple_pay' | 'tamara' | 'payzaty' | 'cod'>('mada');
+  const [paymentMethod, setPaymentMethod] = useState<'mada' | 'apple_pay' | 'payzaty' | 'cod'>('mada');
   const [formData, setFormData] = useState({
     fullName: '',
     phone: '',
@@ -117,7 +117,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
           {/* Payment Methods */}
           <div>
             <h4 className="text-xs font-bold text-amber-400 uppercase tracking-wider mb-3">2. طريقة الدفع المفضلة</h4>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               <label className={`p-3 rounded-xl border flex flex-col items-center justify-center text-center cursor-pointer transition ${
                 paymentMethod === 'mada' ? 'bg-amber-500/10 border-amber-500 text-amber-400' : 'bg-slate-950 border-slate-800 text-slate-300 hover:border-slate-700'
               }`}>
@@ -134,13 +134,6 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 <span className="text-xs font-bold">Apple Pay</span>
               </label>
 
-              <label className={`p-3 rounded-xl border flex flex-col items-center justify-center text-center cursor-pointer transition ${
-                paymentMethod === 'tamara' ? 'bg-amber-500/10 border-amber-500 text-amber-400' : 'bg-slate-950 border-slate-800 text-slate-300 hover:border-slate-700'
-              }`}>
-                <input type="radio" name="payment" checked={paymentMethod === 'tamara'} onChange={() => setPaymentMethod('tamara')} className="hidden" />
-                <span className="text-xs font-black text-amber-300 mb-1">tamara</span>
-                <span className="text-xs font-bold">تمارا (تقسيط)</span>
-              </label>
 
               <label className={`p-3 rounded-xl border flex flex-col items-center justify-center text-center cursor-pointer transition ${
                 paymentMethod === 'cod' ? 'bg-amber-500/10 border-amber-500 text-amber-400' : 'bg-slate-950 border-slate-800 text-slate-300 hover:border-slate-700'
