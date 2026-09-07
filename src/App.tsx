@@ -11,213 +11,199 @@ import { PoliciesModal } from './components/PoliciesModal';
 import { Footer } from './components/Footer';
 import rawProducts from './data/products.json';
 import { Product, CartItem } from './types/store';
-import { Sparkles, ArrowUpDown } from 'lucide-react';
 
 export function App() {
-  const products = rawProducts as Product[];
-
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [isCartOpen, setIsCartOpen] = useState(false);
-  const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
-  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
-  const [orderSuccessData, setOrderSuccessData] = useState<any>(null);
-  const [policiesModalTab, setPoliciesModalTab] = useState<string | null>(null);
+  const products: Product[] = rawProducts as Product[];
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [sortBy, setSortBy] = useState<'featured' | 'price_low' | 'price_high'>('featured');
+  const [sortBy, setSortBy] = useState<'featured' | 'price-low' | 'price-high'>('featured');
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [isSuccessOpen, setIsSuccessOpen] = useState(false);
+  const [isPoliciesOpen, setIsPoliciesOpen] = useState(false);
+  const [activePolicyTab, setActivePolicyTab] = useState<'returns' | 'shipping' | 'terms' | 'privacy'>('returns');
+  const [orderData, setOrderData] = useState<any>(null);
 
   const categories = useMemo(() => {
-    const set = new Set<string>();
+    const cats = new Set<string>();
     products.forEach((p) => {
-      if (p.category) set.add(p.category);
-      if (p.categories) p.categories.forEach((c) => set.add(c));
+      if (p.category) cats.add(p.category);
     });
-    return Array.from(set).slice(0, 8);
+    return Array.from(cats);
   }, [products]);
 
   const filteredProducts = useMemo(() => {
-    return products
-      .filter((p) => {
-        const matchesCat =
-          selectedCategory === 'all' ||
-          p.category === selectedCategory ||
-          (p.categories && p.categories.includes(selectedCategory));
-
-        const query = searchQuery.toLowerCase().trim();
-        const matchesQuery =
-          !query ||
-          (p.name && p.name.toLowerCase().includes(query)) ||
-          (p.title && p.title.toLowerCase().includes(query)) ||
-          (p.description && p.description.toLowerCase().includes(query)) ||
-          (p.brand && p.brand.toLowerCase().includes(query));
-
-        return matchesCat && matchesQuery;
-      })
-      .sort((a, b) => {
-        if (sortBy === 'price_low') return a.price - b.price;
-        if (sortBy === 'price_high') return b.price - a.price;
-        return 0;
-      });
+    return products.filter((p) => {
+      const matchCat = selectedCategory === 'all' || p.category === selectedCategory;
+      const matchQuery = !searchQuery || 
+        p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (p.sku && p.sku.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (p.brand && p.brand.toLowerCase().includes(searchQuery.toLowerCase()));
+      return matchCat && matchQuery;
+    }).sort((a, b) => {
+      if (sortBy === 'price-low') return a.price - b.price;
+      if (sortBy === 'price-high') return b.price - a.price;
+      return 0;
+    });
   }, [products, selectedCategory, searchQuery, sortBy]);
 
-  const handleAddToCart = (product: Product, qty = 1) => {
-    setCartItems((prev) => {
+  const handleAddToCart = (product: Product, quantity: number = 1) => {
+    setCart((prev) => {
       const existing = prev.find((item) => item.product.id === product.id);
       if (existing) {
         return prev.map((item) =>
-          item.product.id === product.id ? { ...item, quantity: item.quantity + qty } : item
+          item.product.id === product.id
+            ? { ...item, quantity: item.quantity + quantity }
+            : item
         );
       }
-      return [...prev, { product, quantity: qty }];
+      return [...prev, { product, quantity }];
     });
     setIsCartOpen(true);
   };
 
   const handleUpdateQuantity = (productId: string, quantity: number) => {
-    setCartItems((prev) =>
-      prev.map((item) => (item.product.id === productId ? { ...item, quantity } : item))
+    if (quantity <= 0) {
+      handleRemoveFromCart(productId);
+      return;
+    }
+    setCart((prev) =>
+      prev.map((item) =>
+        item.product.id === productId ? { ...item, quantity } : item
+      )
     );
   };
 
-  const handleRemoveItem = (productId: string) => {
-    setCartItems((prev) => prev.filter((item) => item.product.id !== productId));
+  const handleRemoveFromCart = (productId: string) => {
+    setCart((prev) => prev.filter((item) => item.product.id !== productId));
   };
 
-  const handleBuyNow = (product: Product, qty = 1) => {
-    handleAddToCart(product, qty);
-    setIsCartOpen(false);
-    setIsCheckoutOpen(true);
+  const handleOpenPolicies = (tab: 'returns' | 'shipping' | 'terms' | 'privacy') => {
+    setActivePolicyTab(tab);
+    setIsPoliciesOpen(true);
   };
 
-  const totalCartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+  const handleOrderSuccess = (data: any) => {
+    setOrderData(data);
+    setCart([]);
+    setIsCheckoutOpen(false);
+    setIsSuccessOpen(true);
+  };
+
+  const totalCartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
-    <div className="min-h-screen flex flex-col bg-stone-100/60 selection:bg-amber-500 selection:text-white">
-      
+    <div className="min-h-screen bg-[#fbfbf8] text-stone-900 flex flex-col font-sans">
       <Header
         cartCount={totalCartCount}
         onOpenCart={() => setIsCartOpen(true)}
+        onOpenPolicies={handleOpenPolicies}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
-        selectedCategory={selectedCategory}
-        setSelectedCategory={setSelectedCategory}
-        categories={categories}
-        onOpenPolicies={(tab) => setPoliciesModalTab(tab)}
       />
 
       <Hero
-        onShopClick={() => {
-          const el = document.getElementById('products-section');
-          if (el) el.scrollIntoView({ behavior: 'smooth' });
-        }}
+        categories={categories}
+        selectedCategory={selectedCategory}
+        onSelectCategory={setSelectedCategory}
         productsCount={products.length}
       />
 
       <Features />
 
-      <main id="products-section" className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
-        
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-8 border-b border-stone-200">
+      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
           <div>
-            <div className="flex items-center gap-2 text-xs font-bold text-amber-600 uppercase tracking-wider mb-1">
-              <Sparkles className="w-4 h-4" />
-              <span>كتالوج التميز والجودة</span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-black text-stone-900">
+            <h2 className="text-xl sm:text-2xl font-black">
               {selectedCategory === 'all' ? 'جميع المنتجات المتوفرة' : selectedCategory}
             </h2>
-            <p className="text-xs text-stone-500 mt-1">
-              عرض {filteredProducts.length} من أصل {products.length} منتج متاح
+            <p className="text-xs opacity-70 mt-1">
+              عرض {filteredProducts.length} منتج متاح للتوصيل والشحن الفوري
             </p>
           </div>
 
-          <div className="flex items-center gap-2 self-start sm:self-auto">
-            <span className="text-xs font-semibold text-stone-500 flex items-center gap-1">
-              <ArrowUpDown className="w-3.5 h-3.5" />
-              ترتيب:
-            </span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs opacity-70">ترتيب:</span>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
-              className="bg-white px-3.5 py-2 rounded-xl border border-stone-200 text-xs font-bold text-stone-800 focus:outline-hidden focus:ring-2 focus:ring-amber-500/20 shadow-xs"
+              className="bg-black/5 border border-current/20 text-xs rounded-xl px-3 py-2 focus:outline-none font-bold"
             >
-              <option value="featured">المميزة والأكثر طلباً</option>
-              <option value="price_low">السعر: من الأقل للأعلى</option>
-              <option value="price_high">السعر: من الأعلى للأقل</option>
+              <option value="featured">المميز والأكثر طلباً</option>
+              <option value="price-low">السعر: من الأقل للأعلى</option>
+              <option value="price-high">السعر: من الأعلى للأقل</option>
             </select>
           </div>
         </div>
 
         {filteredProducts.length === 0 ? (
-          <div className="py-20 text-center space-y-3">
-            <div className="text-4xl">🔍</div>
-            <h3 className="font-bold text-stone-800 text-lg">لم نتمكن من العثور على أي منتج</h3>
-            <p className="text-xs text-stone-500">
-              جرّب البحث بكلمات أخرى أو اختر تصنيفاً مختلفاً
-            </p>
+          <div className="bg-black/5 border border-current/10 rounded-3xl p-12 text-center">
+            <p className="text-base font-bold mb-2">لم يتم العثور على منتجات مطابقة لبحثك</p>
+            <p className="text-xs opacity-60 mb-4">جرب البحث بكلمات أخرى أو اختر فئة مختلفة</p>
             <button
-              onClick={() => { setSearchQuery(''); setSelectedCategory('all'); }}
-              className="mt-2 px-5 py-2 rounded-xl bg-stone-900 text-white text-xs font-bold"
+              onClick={() => {
+                setSearchQuery('');
+                setSelectedCategory('all');
+              }}
+              className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black shadow-lg shadow-amber-500/20 text-xs px-4 py-2 rounded-xl"
             >
-              إعادة ضبط الفلاتر
+              إعادة تعيين البحث
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 sm:gap-6 pt-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {filteredProducts.map((product) => (
               <ProductCard
                 key={product.id}
                 product={product}
-                onQuickView={(p) => setQuickViewProduct(p)}
+                onSelect={setSelectedProduct}
                 onAddToCart={(p) => handleAddToCart(p, 1)}
               />
             ))}
           </div>
         )}
-
       </main>
 
-      <Footer onOpenPolicies={(tab) => setPoliciesModalTab(tab)} />
+      <Footer onOpenPolicies={handleOpenPolicies} />
 
       <ProductModal
-        product={quickViewProduct}
-        onClose={() => setQuickViewProduct(null)}
-        onAddToCart={(p, qty) => handleAddToCart(p, qty)}
-        onBuyNow={(p, qty) => handleBuyNow(p, qty)}
+        product={selectedProduct}
+        onClose={() => setSelectedProduct(null)}
+        onAddToCart={handleAddToCart}
       />
 
       <CartDrawer
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
-        cartItems={cartItems}
+        items={cart}
         onUpdateQuantity={handleUpdateQuantity}
-        onRemoveItem={handleRemoveItem}
-        onCheckout={() => setIsCheckoutOpen(true)}
+        onRemoveItem={handleRemoveFromCart}
+        onProceedToCheckout={() => setIsCheckoutOpen(true)}
       />
 
       <CheckoutModal
         isOpen={isCheckoutOpen}
         onClose={() => setIsCheckoutOpen(false)}
-        cartItems={cartItems}
-        onOrderSuccess={(data) => {
-          setIsCheckoutOpen(false);
-          setCartItems([]);
-          setOrderSuccessData(data);
-        }}
+        items={cart}
+        onOrderSuccess={handleOrderSuccess}
       />
 
       <OrderSuccessModal
-        orderData={orderSuccessData}
-        onClose={() => setOrderSuccessData(null)}
+        orderData={orderData}
+        onClose={() => setIsSuccessOpen(false)}
       />
 
       <PoliciesModal
-        isOpen={policiesModalTab !== null}
-        initialTab={policiesModalTab || 'about'}
-        onClose={() => setPoliciesModalTab(null)}
+        isOpen={isPoliciesOpen}
+        onClose={() => setIsPoliciesOpen(false)}
+        activeTab={activePolicyTab}
+        setActiveTab={setActivePolicyTab}
       />
-
     </div>
   );
 }

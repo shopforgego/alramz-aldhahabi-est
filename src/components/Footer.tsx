@@ -1,152 +1,103 @@
 import React from 'react';
-import { ShieldCheck, Phone, Mail, MapPin, MessageCircle, ArrowUp } from 'lucide-react';
-import { storeConfig } from '../config/store-config';
+import { ShieldCheck, Phone, Mail, MapPin, FileText } from 'lucide-react';
+import { storeConfig } from '../config/store';
+import { Logo } from './Logo';
 
 interface FooterProps {
-  onOpenPolicies: (tab: string) => void;
+  onOpenPolicies: (tab: 'returns' | 'shipping' | 'terms' | 'privacy') => void;
 }
 
 export const Footer: React.FC<FooterProps> = ({ onOpenPolicies }) => {
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
   return (
-    <footer className="bg-stone-950 text-stone-300 pt-14 pb-8 border-t border-stone-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 pb-12 border-b border-stone-850">
-          
-          <div className="lg:col-span-5 space-y-4">
-            <div className="flex items-center gap-3">
-              <img 
-                src="/logo.png" 
-                alt={storeConfig.storeNameAr} 
-                className="h-12 w-12 object-contain rounded-xl bg-white p-1 border border-stone-700" 
-              />
-              <div>
-                <h3 className="text-lg font-black text-white">{storeConfig.storeNameAr}</h3>
-                <p className="text-xs text-amber-400 font-medium">{storeConfig.companyNameAr}</p>
-              </div>
-            </div>
-
-            <p className="text-xs text-stone-400 leading-relaxed max-w-sm">
+    <footer className="bg-slate-950 border-t border-slate-800 text-slate-400 text-xs">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {/* Col 1: Brand & CR */}
+          <div className="space-y-3">
+            <Logo />
+            <p className="text-slate-400 text-xs leading-relaxed">
               {storeConfig.taglineAr}
             </p>
-
-            <div className="p-3.5 rounded-xl bg-stone-900 border border-stone-800 space-y-1.5 text-xs text-stone-300">
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>سجل تجاري معتمد: <strong className="text-white font-mono">{storeConfig.cr}</strong></span>
+            <div className="pt-2 border-t border-slate-900 space-y-1.5 text-[11px] text-slate-400">
+              <div className="flex items-center gap-1.5 text-amber-400 font-bold">
+                <ShieldCheck className="w-4 h-4" />
+                <span>السجل التجاري الموحد: {storeConfig.cr}</span>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="w-4 h-4 text-center font-bold text-amber-400">#</span>
-                <span>الرقم الضريبي: <strong className="text-white font-mono">{storeConfig.taxNumber}</strong></span>
-              </div>
-              <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-sky-400 shrink-0" />
-                <span>العنوان المختصر: <strong className="text-white font-mono">{storeConfig.shortAddress}</strong> ({storeConfig.city})</span>
-              </div>
+              <div>الرقم الضريبي: {storeConfig.taxNumber}</div>
+              <div>الكيان: مؤسسة تجارية سعودية نشطة معتمدة</div>
             </div>
           </div>
 
-          <div className="lg:col-span-2 space-y-3">
-            <h4 className="font-bold text-white text-sm">روابط سريعة</h4>
-            <ul className="space-y-2 text-xs text-stone-400">
+          {/* Col 2: Quick Links */}
+          <div>
+            <h4 className="text-white font-extrabold text-sm mb-3">روابط هامة وسياسات</h4>
+            <ul className="space-y-2">
               <li>
-                <button onClick={() => onOpenPolicies('about')} className="hover:text-white transition-colors">
-                  من نحن والاعتماد
+                <button onClick={() => onOpenPolicies('returns')} className="hover:text-amber-400 transition">
+                  سياسة الاستبدال والاسترجاع
                 </button>
               </li>
               <li>
-                <button onClick={() => onOpenPolicies('return')} className="hover:text-white transition-colors">
-                  الاستبدال والاسترجاع
+                <button onClick={() => onOpenPolicies('shipping')} className="hover:text-amber-400 transition">
+                  الشحن والضمان والتوصيل
                 </button>
               </li>
               <li>
-                <button onClick={() => onOpenPolicies('shipping')} className="hover:text-white transition-colors">
-                  الشحن والتوصيل
-                </button>
-              </li>
-              <li>
-                <button onClick={() => onOpenPolicies('terms')} className="hover:text-white transition-colors">
+                <button onClick={() => onOpenPolicies('terms')} className="hover:text-amber-400 transition">
                   الشروط والأحكام
                 </button>
               </li>
               <li>
-                <button onClick={() => onOpenPolicies('contact')} className="hover:text-white transition-colors">
-                  تواصل معنا
+                <button onClick={() => onOpenPolicies('privacy')} className="hover:text-amber-400 transition">
+                  سياسة الخصوصية والأمان
                 </button>
               </li>
             </ul>
           </div>
 
-          <div className="lg:col-span-2 space-y-3">
-            <h4 className="font-bold text-white text-sm">خدمة العملاء</h4>
-            <ul className="space-y-2 text-xs text-stone-400">
-              <li>
-                <a href={`tel:${storeConfig.phone}`} className="hover:text-white flex items-center gap-1.5 font-mono">
-                  <Phone className="w-3.5 h-3.5 text-amber-400" />
-                  {storeConfig.phone}
-                </a>
+          {/* Col 3: Contact & Address */}
+          <div>
+            <h4 className="text-white font-extrabold text-sm mb-3">بيانات التواصل والمقر</h4>
+            <ul className="space-y-2.5 text-slate-300">
+              <li className="flex items-start gap-2">
+                <MapPin className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+                <span>{storeConfig.fullAddress} (رمز: {storeConfig.shortAddress})</span>
               </li>
-              <li>
-                <a href={`https://wa.me/${storeConfig.whatsapp}`} target="_blank" rel="noreferrer" className="hover:text-emerald-400 flex items-center gap-1.5">
-                  <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
-                  محادثة واتساب مباشرة
-                </a>
+              <li className="flex items-center gap-2">
+                <Mail className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                <a href={`mailto:${storeConfig.email}`} className="hover:text-amber-400 transition">{storeConfig.email}</a>
               </li>
-              <li>
-                <a href={`mailto:${storeConfig.email}`} className="hover:text-white flex items-center gap-1.5 font-mono text-[11px]">
-                  <Mail className="w-3.5 h-3.5 text-sky-400" />
-                  {storeConfig.email}
+              <li className="flex items-center gap-2">
+                <Phone className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                <a href={`https://wa.me/${storeConfig.whatsapp}`} className="hover:text-amber-400 transition" dir="ltr">
+                  +{storeConfig.whatsapp}
                 </a>
-              </li>
-              <li className="text-[11px] text-stone-500 pt-1">
-                {storeConfig.supportHours}
               </li>
             </ul>
           </div>
 
-          <div className="lg:col-span-3 space-y-3">
-            <h4 className="font-bold text-white text-sm">وسائل الدفع المعتمدة</h4>
-            <p className="text-xs text-stone-400">
-              دفع آمن 100% متوافق مع معايير البنك المركزي السعودي ومزودي خدمات الدفع المرخصين.
-            </p>
-            <div className="flex flex-wrap gap-2 pt-1">
-              <span className="px-2.5 py-1 bg-stone-900 border border-stone-800 rounded-md text-xs font-bold text-stone-200">
-                Payzaty
-              </span>
-              <span className="px-2.5 py-1 bg-stone-900 border border-stone-800 rounded-md text-xs font-bold text-emerald-400">
-                مدى Mada
-              </span>
-              <span className="px-2.5 py-1 bg-stone-900 border border-stone-800 rounded-md text-xs font-bold text-stone-200">
-                Apple Pay
-              </span>
-              <span className="px-2.5 py-1 bg-stone-900 border border-stone-800 rounded-md text-xs font-bold text-amber-400">
-                Visa / MC
-              </span>
-              <span className="px-2.5 py-1 bg-stone-900 border border-stone-800 rounded-md text-xs font-bold text-rose-400">
-                تمارا Tamara
-              </span>
+          {/* Col 4: Payment Badges */}
+          <div>
+            <h4 className="text-white font-extrabold text-sm mb-3">وسائل الدفع المعتمدة</h4>
+            <div className="grid grid-cols-3 gap-2 text-center text-[10px] font-bold">
+              <div className="bg-slate-900 border border-slate-800 p-2 rounded-lg text-slate-200">مدى (mada)</div>
+              <div className="bg-slate-900 border border-slate-800 p-2 rounded-lg text-slate-200">Apple Pay</div>
+              <div className="bg-slate-900 border border-slate-800 p-2 rounded-lg text-slate-200">Visa / MC</div>
+              <div className="bg-slate-900 border border-slate-800 p-2 rounded-lg text-slate-200">تمارا (تقسيط)</div>
+              <div className="bg-slate-900 border border-slate-800 p-2 rounded-lg text-slate-200">Payzaty</div>
+              <div className="bg-slate-900 border border-slate-800 p-2 rounded-lg text-slate-200">الدفع بالاستلام</div>
             </div>
           </div>
-
         </div>
 
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-stone-500">
+        <div className="mt-10 pt-6 border-t border-slate-900 flex flex-col sm:flex-row justify-between items-center gap-4 text-slate-500 text-[11px]">
           <div>
-            © {new Date().getFullYear()} <strong>{storeConfig.companyNameAr}</strong>. جميع الحقوق محفوظة.
+            جميع الحقوق محفوظة © {new Date().getFullYear()} {storeConfig.companyNameAr}
           </div>
-          <button
-            onClick={scrollToTop}
-            className="flex items-center gap-1.5 text-stone-400 hover:text-white transition-colors bg-stone-900 px-3 py-1.5 rounded-lg border border-stone-800"
-          >
-            <span>العودة للأعلى</span>
-            <ArrowUp className="w-3.5 h-3.5" />
-          </button>
+          <div>
+            المتجر الرسمي لقطع غيار وإكسسوارات السيارات المعتمد في المملكة العربية السعودية
+          </div>
         </div>
-
       </div>
     </footer>
   );

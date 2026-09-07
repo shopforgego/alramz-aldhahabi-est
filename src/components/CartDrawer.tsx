@@ -1,75 +1,81 @@
 import React, { useState } from 'react';
-import { X, Trash2, ShoppingBag, ArrowLeft, ShieldCheck } from 'lucide-react';
+import { X, Trash2, ShoppingBag, ArrowLeft, Tag, Truck } from 'lucide-react';
 import { CartItem } from '../types/store';
-import { storeConfig } from '../config/store-config';
+import { storeConfig } from '../config/store';
 
 interface CartDrawerProps {
   isOpen: boolean;
   onClose: () => void;
-  cartItems: CartItem[];
+  items: CartItem[];
   onUpdateQuantity: (productId: string, quantity: number) => void;
   onRemoveItem: (productId: string) => void;
-  onCheckout: () => void;
+  onProceedToCheckout: () => void;
 }
 
 export const CartDrawer: React.FC<CartDrawerProps> = ({
   isOpen,
   onClose,
-  cartItems,
+  items,
   onUpdateQuantity,
   onRemoveItem,
-  onCheckout
+  onProceedToCheckout,
 }) => {
   if (!isOpen) return null;
 
-  const [promoCode, setPromoCode] = useState('');
-  const [promoApplied, setPromoApplied] = useState(false);
+  const [coupon, setCoupon] = useState('');
+  const [discount, setDiscount] = useState(0);
+  const [couponApplied, setCouponApplied] = useState(false);
 
-  const subtotal = cartItems.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
-  const discountAmount = promoApplied ? subtotal * 0.1 : 0;
+  const subtotal = items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
   const isFreeShipping = subtotal >= storeConfig.freeShippingThreshold;
-  const shippingCost = isFreeShipping || subtotal === 0 ? 0 : storeConfig.shippingCost;
-  const grandTotal = Math.max(0, subtotal - discountAmount + shippingCost);
+  const shipping = items.length === 0 ? 0 : (isFreeShipping ? 0 : storeConfig.shippingCost);
+  const total = Math.max(0, subtotal - discount + shipping);
 
-  const remainingForFreeShipping = Math.max(0, storeConfig.freeShippingThreshold - subtotal);
-  const progressPercent = Math.min(100, Math.round((subtotal / storeConfig.freeShippingThreshold) * 100));
+  const handleApplyCoupon = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (coupon.trim().toUpperCase() === 'WAROOD10' || coupon.trim().toUpperCase() === 'CARS10') {
+      const disc = subtotal * 0.1;
+      setDiscount(disc);
+      setCouponApplied(true);
+    } else {
+      alert('كوبون الخصم غير صالح. جرب استخدام: WAROOD10');
+    }
+  };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden bg-stone-950/60 backdrop-blur-xs flex justify-end">
-      <div className="relative w-full max-w-md bg-white h-full shadow-2xl flex flex-col justify-between">
-        
-        {/* Cart Header */}
-        <div className="p-4 sm:p-5 border-b border-stone-200 flex items-center justify-between bg-stone-50">
+    <div className="fixed inset-0 z-50 overflow-hidden bg-slate-950/80 backdrop-blur-sm flex justify-start">
+      <div className="w-full max-w-md bg-slate-900 border-l border-slate-800 h-full flex flex-col shadow-2xl animate-in slide-in-from-left duration-300">
+        {/* Header */}
+        <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-slate-950/60">
           <div className="flex items-center gap-2">
-            <ShoppingBag className="w-5 h-5 text-amber-600" />
-            <h3 className="font-black text-base text-stone-900">
-              سلة المشتريات ({cartItems.reduce((acc, item) => acc + item.quantity, 0)})
-            </h3>
+            <ShoppingBag className="w-5 h-5 text-amber-400" />
+            <h3 className="font-extrabold text-base text-white">سلة المشتريات ({items.length})</h3>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-stone-500 hover:text-stone-900 hover:bg-stone-200 transition-colors"
+            className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Free Shipping Progress Bar */}
-        <div className="bg-amber-50/80 p-3 px-5 border-b border-amber-200/60 text-xs">
+        {/* Free Shipping Progress */}
+        <div className="bg-slate-950 p-3 border-b border-slate-800 text-xs">
           {isFreeShipping ? (
-            <div className="text-emerald-700 font-bold text-center">
-              🎉 مبروك! لقد حصلت على شحن مجاني لكافة مدن المملكة!
+            <div className="text-emerald-400 font-bold flex items-center gap-1.5 justify-center">
+              <Truck className="w-4 h-4" />
+              <span>مبروك! لقد حصلت على شحن مجاني لكافة مدن المملكة 🎉</span>
             </div>
           ) : (
-            <div className="space-y-1.5">
-              <div className="flex justify-between text-stone-700">
-                <span>أضف بقيمة <strong>{remainingForFreeShipping.toFixed(2)} {storeConfig.currencySymbol}</strong> للشحن المجاني</span>
-                <span className="font-bold text-amber-700">{progressPercent}%</span>
+            <div>
+              <div className="flex justify-between text-slate-300 mb-1 font-medium">
+                <span>أضف بـ <strong className="text-amber-400">{(storeConfig.freeShippingThreshold - subtotal).toFixed(2)} {storeConfig.currencySymbol}</strong> للشحن المجاني</span>
+                <span>{Math.round((subtotal / storeConfig.freeShippingThreshold) * 100)}%</span>
               </div>
-              <div className="w-full bg-stone-200 h-1.5 rounded-full overflow-hidden">
-                <div 
+              <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                <div
                   className="bg-amber-500 h-full rounded-full transition-all duration-300"
-                  style={{ width: `${progressPercent}%` }}
+                  style={{ width: `${Math.min(100, (subtotal / storeConfig.freeShippingThreshold) * 100)}%` }}
                 />
               </div>
             </div>
@@ -77,68 +83,54 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
         </div>
 
         {/* Items List */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
-          {cartItems.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-3">
-              <div className="w-16 h-16 rounded-full bg-stone-100 flex items-center justify-center text-stone-400">
-                <ShoppingBag className="w-8 h-8" />
-              </div>
-              <h4 className="font-bold text-stone-800 text-base">سلة التسوق فارغة</h4>
-              <p className="text-xs text-stone-500 max-w-xs">
-                تصفح تشكيلاتنا الفاخرة واختر المنتجات التي ترغب في شرائها بكل سهولة.
-              </p>
+        <div className="flex-1 overflow-y-auto p-4 space-y-3">
+          {items.length === 0 ? (
+            <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-400">
+              <ShoppingBag className="w-16 h-16 text-slate-700 mb-3" />
+              <p className="font-bold text-slate-300 mb-1">سلة المشتريات فارغة</p>
+              <p className="text-xs text-slate-500 mb-4">تصفح الكتالوج وأضف قطع الغيار التي تحتاجها لسيارتك</p>
               <button
                 onClick={onClose}
-                className="mt-2 px-5 py-2.5 rounded-xl bg-stone-900 text-white font-bold text-xs hover:bg-stone-800"
+                className="bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-xs px-4 py-2.5 rounded-xl border border-slate-700 transition"
               >
-                تصفح المنتجات الآن
+                تصفح المنتجات
               </button>
             </div>
           ) : (
-            cartItems.map((item) => (
+            items.map((item) => (
               <div
                 key={item.product.id}
-                className="flex gap-3.5 p-3 rounded-2xl border border-stone-200 bg-stone-50/40 hover:bg-white transition-colors"
+                className="bg-slate-950 border border-slate-800/80 p-3 rounded-2xl flex gap-3 items-center"
               >
                 <img
-                  src={item.product.main_image || item.product.image || '/logo.png'}
-                  alt={item.product.name}
-                  className="w-20 h-20 rounded-xl object-cover border border-stone-200 bg-stone-100 shrink-0"
+                  src={item.product.main_image || item.product.image}
+                  alt={item.product.title}
+                  className="w-16 h-16 object-cover rounded-xl border border-slate-800 flex-shrink-0"
                 />
-
-                <div className="flex-1 flex flex-col justify-between">
-                  <div>
-                    <h4 className="font-bold text-xs sm:text-sm text-stone-900 line-clamp-2 leading-snug">
-                      {item.product.name || item.product.title}
-                    </h4>
-                    <div className="text-xs font-black text-amber-700 mt-1">
-                      {item.product.price} {storeConfig.currencySymbol}
-                    </div>
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-bold text-xs text-white truncate mb-1">{item.product.title}</h4>
+                  <div className="text-xs font-black text-amber-400">
+                    {item.product.price.toFixed(2)} {storeConfig.currencySymbol}
                   </div>
-
-                  {/* Quantity Stepper & Remove */}
-                  <div className="flex items-center justify-between pt-2">
-                    <div className="flex items-center border border-stone-300 rounded-lg overflow-hidden bg-white">
+                  <div className="flex items-center gap-2 mt-2">
+                    <div className="flex items-center bg-slate-900 border border-slate-700 rounded-lg text-xs">
                       <button
-                        onClick={() => onUpdateQuantity(item.product.id, Math.max(1, item.quantity - 1))}
-                        className="px-2 py-0.5 text-stone-600 hover:bg-stone-100 font-bold text-xs"
+                        onClick={() => onUpdateQuantity(item.product.id, item.quantity - 1)}
+                        className="px-2 py-0.5 text-slate-300 hover:text-white"
                       >
                         -
                       </button>
-                      <span className="px-2.5 py-0.5 text-xs font-bold text-stone-900">
-                        {item.quantity}
-                      </span>
+                      <span className="px-2 py-0.5 font-bold text-amber-400">{item.quantity}</span>
                       <button
                         onClick={() => onUpdateQuantity(item.product.id, item.quantity + 1)}
-                        className="px-2 py-0.5 text-stone-600 hover:bg-stone-100 font-bold text-xs"
+                        className="px-2 py-0.5 text-slate-300 hover:text-white"
                       >
                         +
                       </button>
                     </div>
-
                     <button
                       onClick={() => onRemoveItem(item.product.id)}
-                      className="p-1.5 text-stone-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                      className="text-slate-500 hover:text-red-400 p-1 transition"
                       title="حذف"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -151,73 +143,62 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
         </div>
 
         {/* Footer Summary */}
-        {cartItems.length > 0 && (
-          <div className="p-4 sm:p-5 border-t border-stone-200 bg-stone-50/90 space-y-3">
-            
-            {/* Promo Code Input */}
-            <div className="flex gap-2">
+        {items.length > 0 && (
+          <div className="p-4 border-t border-slate-800 bg-slate-950 space-y-3">
+            {/* Coupon */}
+            <form onSubmit={handleApplyCoupon} className="flex gap-2">
               <input
                 type="text"
-                placeholder="كود الخصم (جرب: SAUDI10)"
-                value={promoCode}
-                onChange={(e) => setPromoCode(e.target.value)}
-                className="flex-1 px-3 py-2 text-xs rounded-xl border border-stone-300 bg-white uppercase font-bold"
+                value={coupon}
+                onChange={(e) => setCoupon(e.target.value)}
+                placeholder="كود الخصم (WAROOD10)"
+                disabled={couponApplied}
+                className="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500"
               />
               <button
-                onClick={() => {
-                  if (promoCode.trim()) {
-                    setPromoApplied(true);
-                  }
-                }}
-                className="px-4 py-2 bg-stone-800 text-white rounded-xl text-xs font-bold hover:bg-stone-900"
+                type="submit"
+                disabled={couponApplied}
+                className="bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold text-xs px-3 py-1.5 rounded-xl border border-slate-700 transition"
               >
-                تطبيق
+                {couponApplied ? 'مطبق ✓' : 'تطبيق'}
               </button>
-            </div>
+            </form>
 
-            {/* Calculations Breakdown */}
-            <div className="space-y-1.5 text-xs text-stone-600 pt-1">
+            <div className="space-y-1.5 text-xs text-slate-400 pt-2 border-t border-slate-800/80">
               <div className="flex justify-between">
                 <span>المجموع الفرعي:</span>
-                <span className="font-bold text-stone-900">{subtotal.toFixed(2)} {storeConfig.currencySymbol}</span>
+                <span className="text-slate-200 font-bold">{subtotal.toFixed(2)} {storeConfig.currencySymbol}</span>
               </div>
-              {promoApplied && (
-                <div className="flex justify-between text-emerald-600 font-bold">
-                  <span>خصم كود الترويج (10%):</span>
-                  <span>-{discountAmount.toFixed(2)} {storeConfig.currencySymbol}</span>
+              {discount > 0 && (
+                <div className="flex justify-between text-emerald-400">
+                  <span>خصم الكوبون (10%):</span>
+                  <span>-{discount.toFixed(2)} {storeConfig.currencySymbol}</span>
                 </div>
               )}
               <div className="flex justify-between">
-                <span>رسوم الشحن:</span>
-                <span>{isFreeShipping ? 'مجاني' : `${shippingCost} ${storeConfig.currencySymbol}`}</span>
+                <span>الشحن والتوصيل:</span>
+                <span className={shipping === 0 ? "text-emerald-400 font-bold" : "text-slate-200"}>
+                  {shipping === 0 ? "مجاني" : `${shipping.toFixed(2)} ${storeConfig.currencySymbol}`}
+                </span>
               </div>
-              <div className="flex justify-between text-stone-400 text-[11px]">
-                <span>ضريبة القيمة المضافة (15%):</span>
-                <span>مشمولة في الأسعار</span>
-              </div>
-              <div className="flex justify-between text-sm sm:text-base font-black text-stone-950 pt-2 border-t border-stone-200">
+              <div className="flex justify-between text-sm font-black text-white pt-2 border-t border-slate-800">
                 <span>الإجمالي النهائي:</span>
-                <span className="text-amber-700 font-black">{grandTotal.toFixed(2)} {storeConfig.currencySymbol}</span>
+                <span className="text-amber-400 text-base">{total.toFixed(2)} {storeConfig.currencySymbol}</span>
               </div>
             </div>
 
-            {/* Checkout Button */}
             <button
-              onClick={() => { onClose(); onCheckout(); }}
-              className="w-full py-3.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-stone-950 font-black rounded-xl text-sm flex items-center justify-center gap-2 shadow-md hover:scale-101 active:scale-99 transition-all"
+              onClick={() => {
+                onClose();
+                onProceedToCheckout();
+              }}
+              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black py-3 rounded-xl shadow-lg shadow-amber-500/20 transition transform active:scale-95 text-sm"
             >
-              <span>متابعة إتمام الطلب</span>
+              <span>متابعة إتمام الطلب والدفع</span>
               <ArrowLeft className="w-4 h-4" />
             </button>
-
-            <div className="flex items-center justify-center gap-1.5 text-[11px] text-stone-500 font-medium">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-              <span>دفع إلكتروني آمن ومشفر 100%</span>
-            </div>
-
           </div>
         )}
-
       </div>
     </div>
   );

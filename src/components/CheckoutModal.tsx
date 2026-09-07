@@ -1,292 +1,182 @@
 import React, { useState } from 'react';
-import { X, ShieldCheck, Lock } from 'lucide-react';
+import { X, ShieldCheck, Lock, CreditCard, Banknote, CheckCircle, Truck } from 'lucide-react';
 import { CartItem } from '../types/store';
-import { storeConfig } from '../config/store-config';
+import { storeConfig } from '../config/store';
 
 interface CheckoutModalProps {
   isOpen: boolean;
   onClose: () => void;
-  cartItems: CartItem[];
+  items: CartItem[];
   onOrderSuccess: (orderData: any) => void;
 }
 
 export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   isOpen,
   onClose,
-  cartItems,
-  onOrderSuccess
+  items,
+  onOrderSuccess,
 }) => {
   if (!isOpen) return null;
 
-  const [fullName, setFullName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [email, setEmail] = useState('');
-  const [city, setCity] = useState('الرياض');
-  const [address, setAddress] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState<'payzaty' | 'mada' | 'apple_pay' | 'tamara'>('payzaty');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'mada' | 'apple_pay' | 'tamara' | 'payzaty' | 'cod'>('mada');
+  const [formData, setFormData] = useState({
+    fullName: '',
+    phone: '',
+    city: 'جازان',
+    district: '',
+    street: '',
+    notes: '',
+  });
 
-  const subtotal = cartItems.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
+  const subtotal = items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
   const isFreeShipping = subtotal >= storeConfig.freeShippingThreshold;
-  const shippingCost = isFreeShipping ? 0 : storeConfig.shippingCost;
-  const grandTotal = subtotal + shippingCost;
+  const shipping = isFreeShipping ? 0 : storeConfig.shippingCost;
+  const total = subtotal + shipping;
 
-  const handleSubmitOrder = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-
-    setTimeout(() => {
-      const orderRef = 'SA-' + Math.floor(100000 + Math.random() * 900000);
-      const orderData = {
-        orderRef,
-        customerName: fullName || 'عميل المتجر',
-        phone,
-        email: email || storeConfig.email,
-        city,
-        address,
-        paymentMethod,
-        items: cartItems,
-        total: grandTotal,
-        date: new Date().toLocaleDateString('ar-SA')
-      };
-      setIsSubmitting(false);
-      onOrderSuccess(orderData);
-    }, 1200);
+    if (!formData.fullName || !formData.phone || !formData.district) {
+      alert('يرجى ملء جميع الحقول الإلزامية (الاسم، الجوال، الحي)');
+      return;
+    }
+    const orderNumber = `WRD-${Math.floor(100000 + Math.random() * 900000)}`;
+    onOrderSuccess({
+      orderNumber,
+      customer: formData,
+      items,
+      total,
+      paymentMethod,
+      date: new Date().toLocaleDateString('ar-SA'),
+    });
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-stone-950/70 backdrop-blur-xs flex items-center justify-center p-4 sm:p-6">
-      <div className="relative bg-white rounded-3xl max-w-2xl w-full max-h-[92vh] overflow-y-auto shadow-2xl border border-stone-200">
-        
-        {/* Header */}
-        <div className="p-5 border-b border-stone-200 flex items-center justify-between bg-stone-50 rounded-t-3xl">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/85 backdrop-blur-sm flex items-center justify-center p-4">
+      <div className="relative bg-slate-900 border border-slate-800 rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-200">
+        <div className="p-5 border-b border-slate-800 flex items-center justify-between bg-slate-950/60">
           <div className="flex items-center gap-2">
-            <Lock className="w-5 h-5 text-amber-600" />
-            <h3 className="font-black text-base sm:text-lg text-stone-900">
-              إتمام الطلب والدفع الآمن
-            </h3>
+            <Lock className="w-5 h-5 text-amber-400" />
+            <h3 className="font-extrabold text-base text-white">إتمام الطلب والدفع الآمن</h3>
           </div>
-          <button
-            onClick={onClose}
-            className="p-1.5 rounded-lg text-stone-500 hover:text-stone-900 hover:bg-stone-200 transition-colors"
-          >
+          <button onClick={onClose} className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition">
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmitOrder} className="p-6 space-y-6">
-          
-          {/* Customer & Address Information */}
-          <div className="space-y-3">
-            <h4 className="font-bold text-sm text-stone-900 flex items-center gap-2">
-              <span className="w-6 h-6 rounded-full bg-stone-900 text-white text-xs flex items-center justify-center">1</span>
-              بيانات العميل وعنوان الشحن
-            </h4>
-
+        <form onSubmit={handleSubmit} className="p-6 space-y-5">
+          {/* Customer Info */}
+          <div>
+            <h4 className="text-xs font-bold text-amber-400 uppercase tracking-wider mb-3">1. بيانات التوصيل والاستلام</h4>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-semibold text-stone-700 mb-1">الاسم الكامل *</label>
+                <label className="block text-xs text-slate-300 mb-1 font-medium">الاسم الكامل *</label>
                 <input
                   type="text"
                   required
-                  placeholder="مثال: فهد بن عبدالعزيز"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-stone-50 rounded-xl border border-stone-300 text-xs focus:bg-white focus:outline-hidden"
+                  value={formData.fullName}
+                  onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                  placeholder="مثال: عبدالله محمد"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
                 />
               </div>
-
               <div>
-                <label className="block text-xs font-semibold text-stone-700 mb-1">رقم الجوال *</label>
+                <label className="block text-xs text-slate-300 mb-1 font-medium">رقم الجوال *</label>
                 <input
                   type="tel"
                   required
-                  placeholder="05XXXXXXXX"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-stone-50 rounded-xl border border-stone-300 text-xs focus:bg-white focus:outline-hidden text-left"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  placeholder="05xxxxxxxx"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
                 />
               </div>
-
               <div>
-                <label className="block text-xs font-semibold text-stone-700 mb-1">البريد الإلكتروني (اختياري)</label>
-                <input
-                  type="email"
-                  placeholder="name@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-stone-50 rounded-xl border border-stone-300 text-xs focus:bg-white focus:outline-hidden text-left"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-stone-700 mb-1">المدينة *</label>
-                <select
-                  value={city}
-                  onChange={(e) => setCity(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-stone-50 rounded-xl border border-stone-300 text-xs focus:bg-white focus:outline-hidden"
-                >
-                  <option value="الرياض">الرياض</option>
-                  <option value="جدة">جدة</option>
-                  <option value="مكة المكرمة">مكة المكرمة</option>
-                  <option value="المدينة المنورة">المدينة المنورة</option>
-                  <option value="الدمام">الدمام</option>
-                  <option value="الخبر">الخبر</option>
-                  <option value="بريدة">بريدة / القصيم</option>
-                  <option value="تبوك">تبوك</option>
-                  <option value="أبها">أبها / عسير</option>
-                  <option value="حائل">حائل</option>
-                  <option value="جازان">جازان</option>
-                  <option value="الطائف">الطائف</option>
-                  <option value="الهفوف">الهفوف / الأحساء</option>
-                </select>
-              </div>
-
-              <div className="sm:col-span-2">
-                <label className="block text-xs font-semibold text-stone-700 mb-1">الحي واسم الشارع *</label>
+                <label className="block text-xs text-slate-300 mb-1 font-medium">المدينة *</label>
                 <input
                   type="text"
                   required
-                  placeholder="مثال: حي الياسمين، شارع أنس بن مالك"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-stone-50 rounded-xl border border-stone-300 text-xs focus:bg-white focus:outline-hidden"
+                  value={formData.city}
+                  onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-slate-300 mb-1 font-medium">الحي والشارع *</label>
+                <input
+                  type="text"
+                  required
+                  value={formData.district}
+                  onChange={(e) => setFormData({ ...formData, district: e.target.value })}
+                  placeholder="اسم الحي ورقم الشارع"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
                 />
               </div>
             </div>
           </div>
 
-          {/* Payment Method Selection */}
-          <div className="space-y-3 pt-2">
-            <h4 className="font-bold text-sm text-stone-900 flex items-center gap-2">
-              <span className="w-6 h-6 rounded-full bg-stone-900 text-white text-xs flex items-center justify-center">2</span>
-              طريقة الدفع المعتمدة
-            </h4>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-              
-              {/* Payzaty */}
-              <label className={`p-3 rounded-2xl border-2 cursor-pointer transition-all flex items-center justify-between ${
-                paymentMethod === 'payzaty' ? 'border-amber-500 bg-amber-50/50' : 'border-stone-200 hover:border-stone-300 bg-white'
+          {/* Payment Methods */}
+          <div>
+            <h4 className="text-xs font-bold text-amber-400 uppercase tracking-wider mb-3">2. طريقة الدفع المفضلة</h4>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <label className={`p-3 rounded-xl border flex flex-col items-center justify-center text-center cursor-pointer transition ${
+                paymentMethod === 'mada' ? 'bg-amber-500/10 border-amber-500 text-amber-400' : 'bg-slate-950 border-slate-800 text-slate-300 hover:border-slate-700'
               }`}>
-                <div className="flex items-center gap-2.5">
-                  <input
-                    type="radio"
-                    name="payment"
-                    value="payzaty"
-                    checked={paymentMethod === 'payzaty'}
-                    onChange={() => setPaymentMethod('payzaty')}
-                    className="text-amber-600 focus:ring-amber-500"
-                  />
-                  <div>
-                    <div className="font-bold text-xs text-stone-900 flex items-center gap-1.5">
-                      <span>بوابة بيزاتي (Payzaty)</span>
-                      <span className="bg-emerald-600 text-white text-[10px] px-1.5 py-0.5 rounded font-bold">معتمد</span>
-                    </div>
-                    <div className="text-[11px] text-stone-500">مدى، فيزا، ماستركارد، آبل باي</div>
-                  </div>
-                </div>
+                <input type="radio" name="payment" checked={paymentMethod === 'mada'} onChange={() => setPaymentMethod('mada')} className="hidden" />
+                <CreditCard className="w-5 h-5 mb-1" />
+                <span className="text-xs font-bold">بطاقة مدى / فيزا</span>
               </label>
 
-              {/* Mada */}
-              <label className={`p-3 rounded-2xl border-2 cursor-pointer transition-all flex items-center justify-between ${
-                paymentMethod === 'mada' ? 'border-amber-500 bg-amber-50/50' : 'border-stone-200 hover:border-stone-300 bg-white'
+              <label className={`p-3 rounded-xl border flex flex-col items-center justify-center text-center cursor-pointer transition ${
+                paymentMethod === 'apple_pay' ? 'bg-amber-500/10 border-amber-500 text-amber-400' : 'bg-slate-950 border-slate-800 text-slate-300 hover:border-slate-700'
               }`}>
-                <div className="flex items-center gap-2.5">
-                  <input
-                    type="radio"
-                    name="payment"
-                    value="mada"
-                    checked={paymentMethod === 'mada'}
-                    onChange={() => setPaymentMethod('mada')}
-                    className="text-amber-600"
-                  />
-                  <div>
-                    <div className="font-bold text-xs text-stone-900">بطاقة مدى (Mada)</div>
-                    <div className="text-[11px] text-stone-500">دفع محلي مباشر وفوري</div>
-                  </div>
-                </div>
+                <input type="radio" name="payment" checked={paymentMethod === 'apple_pay'} onChange={() => setPaymentMethod('apple_pay')} className="hidden" />
+                <span className="text-base font-black mb-0.5"> Pay</span>
+                <span className="text-xs font-bold">Apple Pay</span>
               </label>
 
-              {/* Apple Pay */}
-              <label className={`p-3 rounded-2xl border-2 cursor-pointer transition-all flex items-center justify-between ${
-                paymentMethod === 'apple_pay' ? 'border-amber-500 bg-amber-50/50' : 'border-stone-200 hover:border-stone-300 bg-white'
+              <label className={`p-3 rounded-xl border flex flex-col items-center justify-center text-center cursor-pointer transition ${
+                paymentMethod === 'tamara' ? 'bg-amber-500/10 border-amber-500 text-amber-400' : 'bg-slate-950 border-slate-800 text-slate-300 hover:border-slate-700'
               }`}>
-                <div className="flex items-center gap-2.5">
-                  <input
-                    type="radio"
-                    name="payment"
-                    value="apple_pay"
-                    checked={paymentMethod === 'apple_pay'}
-                    onChange={() => setPaymentMethod('apple_pay')}
-                    className="text-amber-600"
-                  />
-                  <div>
-                    <div className="font-bold text-xs text-stone-900">Apple Pay</div>
-                    <div className="text-[11px] text-stone-500">دفع سريع بلمسة واحدة</div>
-                  </div>
-                </div>
+                <input type="radio" name="payment" checked={paymentMethod === 'tamara'} onChange={() => setPaymentMethod('tamara')} className="hidden" />
+                <span className="text-xs font-black text-amber-300 mb-1">tamara</span>
+                <span className="text-xs font-bold">تمارا (تقسيط)</span>
               </label>
 
-              {/* Tamara */}
-              <label className={`p-3 rounded-2xl border-2 cursor-pointer transition-all flex items-center justify-between ${
-                paymentMethod === 'tamara' ? 'border-amber-500 bg-amber-50/50' : 'border-stone-200 hover:border-stone-300 bg-white'
+              <label className={`p-3 rounded-xl border flex flex-col items-center justify-center text-center cursor-pointer transition ${
+                paymentMethod === 'cod' ? 'bg-amber-500/10 border-amber-500 text-amber-400' : 'bg-slate-950 border-slate-800 text-slate-300 hover:border-slate-700'
               }`}>
-                <div className="flex items-center gap-2.5">
-                  <input
-                    type="radio"
-                    name="payment"
-                    value="tamara"
-                    checked={paymentMethod === 'tamara'}
-                    onChange={() => setPaymentMethod('tamara')}
-                    className="text-amber-600"
-                  />
-                  <div>
-                    <div className="font-bold text-xs text-stone-900">تمارا (Tamara)</div>
-                    <div className="text-[11px] text-stone-500">قسمها على 4 دفعات بدون فوائد</div>
-                  </div>
-                </div>
+                <input type="radio" name="payment" checked={paymentMethod === 'cod'} onChange={() => setPaymentMethod('cod')} className="hidden" />
+                <Banknote className="w-5 h-5 mb-1" />
+                <span className="text-xs font-bold">عند الاستلام</span>
               </label>
-
             </div>
           </div>
 
           {/* Order Summary */}
-          <div className="p-4 rounded-2xl bg-stone-50 border border-stone-200 space-y-2 text-xs">
-            <div className="flex justify-between text-stone-600">
-              <span>المجموع الفرعي ({cartItems.length} منتجات):</span>
-              <span className="font-bold text-stone-900">{subtotal.toFixed(2)} {storeConfig.currencySymbol}</span>
+          <div className="bg-slate-950 border border-slate-800 rounded-2xl p-4">
+            <div className="flex justify-between text-xs text-slate-400 mb-1">
+              <span>قيمة المنتجات ({items.length} قطع):</span>
+              <span className="font-bold text-slate-200">{subtotal.toFixed(2)} {storeConfig.currencySymbol}</span>
             </div>
-            <div className="flex justify-between text-stone-600">
-              <span>الشحن والتوصيل لـ {city}:</span>
-              <span className="font-bold text-stone-900">{isFreeShipping ? 'مجاني' : `${shippingCost} ${storeConfig.currencySymbol}`}</span>
+            <div className="flex justify-between text-xs text-slate-400 mb-2">
+              <span>الشحن:</span>
+              <span className={shipping === 0 ? "text-emerald-400 font-bold" : "text-slate-200 font-bold"}>
+                {shipping === 0 ? "مجاني" : `${shipping.toFixed(2)} ${storeConfig.currencySymbol}`}
+              </span>
             </div>
-            <div className="flex justify-between text-sm font-black text-stone-950 pt-2 border-t border-stone-200">
-              <span>المبلغ الإجمالي المستحق:</span>
-              <span className="text-amber-700 font-black text-base">{grandTotal.toFixed(2)} {storeConfig.currencySymbol}</span>
+            <div className="flex justify-between text-base font-black text-white pt-2 border-t border-slate-800">
+              <span>المبلغ المستحق للدفع:</span>
+              <span className="text-amber-400">{total.toFixed(2)} {storeConfig.currencySymbol}</span>
             </div>
           </div>
 
           <button
             type="submit"
-            disabled={isSubmitting}
-            className="w-full py-4 bg-stone-900 hover:bg-stone-800 disabled:bg-stone-400 text-white font-black rounded-2xl text-sm shadow-lg flex items-center justify-center gap-2 hover:scale-101 active:scale-99 transition-all"
+            className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black py-3.5 rounded-xl shadow-lg shadow-amber-500/20 transition transform active:scale-95 text-sm"
           >
-            {isSubmitting ? (
-              <span className="inline-flex items-center gap-2">
-                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                جاري تأكيد الطلب ومعالجة الدفع...
-              </span>
-            ) : (
-              <>
-                <ShieldCheck className="w-5 h-5 text-amber-400" />
-                <span>تأكيد الطلب والدفع النهائي ({grandTotal.toFixed(2)} {storeConfig.currencySymbol})</span>
-              </>
-            )}
+            تأكيد الطلب والدفع الفوري ({total.toFixed(2)} {storeConfig.currencySymbol})
           </button>
-
         </form>
-
       </div>
     </div>
   );
