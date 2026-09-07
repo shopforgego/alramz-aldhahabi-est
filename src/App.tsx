@@ -102,7 +102,6 @@ export function App() {
       <Header
         cartCount={totalCartCount}
         onOpenCart={() => setIsCartOpen(true)}
-        onOpenPolicies={handleOpenPolicies}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
       />
