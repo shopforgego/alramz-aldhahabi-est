@@ -1,7 +1,7 @@
 import React from 'react';
 
-const chipClass =
-  "inline-flex items-center gap-2 rounded-md bg-white px-3 py-1.5 text-xs font-semibold text-[#1f2a44] shadow-sm border border-slate-200/80";
+const badgeClass =
+  "inline-flex items-center justify-center h-9 px-3.5 rounded-lg bg-white shadow-sm border border-slate-200";
 
 export function PaymentChips() {
   return (
@@ -9,10 +9,10 @@ export function PaymentChips() {
       <p className="text-[11px] font-bold tracking-[0.15em] text-slate-500 mb-3">
         وسائل الدفع المعتمدة
       </p>
-      <div className="flex flex-wrap items-center justify-center gap-2">
-        {/* Mada FIRST from right in RTL */}
-        <span className={chipClass}>
-          <svg className="w-10 h-4 shrink-0" viewBox="0 0 796.2 265.5" fill="none" aria-hidden="true">
+      <div className="flex flex-wrap items-center justify-center gap-2.5">
+        {/* 1. MADA FIRST in RTL */}
+        <span className={badgeClass} title="مدى mada">
+          <svg className="h-5 w-auto" viewBox="0 0 796.2 265.5" fill="none" aria-label="مدى mada">
                   <rect width="336.8" height="112.3" fill="#259BD6" />
                   <rect y="153.1" width="336.8" height="112.2" fill="#84B740" />
                   <path fill="#27292D" d="M673.6,242.5l-1.5,0.3c-5.2,1-7.1,1.4-10.9,1.4c-8.8,0-19.2-4.5-19.2-25.7c0-10.9,1.8-25.4,18.2-25.4h0.1 c2.8,0.2,6,0.5,12,2.3l1.3,0.4L673.6,242.5L673.6,242.5z M676.3,136.8l-2.7,0.5v39.2l-2.4-0.7l-0.7-0.2c-2.7-0.8-8.9-2.6-14.9-2.6 c-32.8,0-39.7,24.8-39.7,45.6c0,28.5,16,44.9,43.9,44.9c11.8,0,20.5-1.2,29.3-4.1c8.1-2.6,11-6.3,11-14.2V132.7 C692.3,134.1,684.2,135.5,676.3,136.8" />
@@ -22,31 +22,33 @@ export function PaymentChips() {
                   <path fill="#27292D" d="M751.5,73.2c-3.9,0-10.4-0.4-15.5-1.4l-1.5-0.3V33c0-3.2-0.6-5.2-0.7-5.5l-0.8-1.6l1.7-0.7 c0.4-0.2,0.8-0.3,1.3-0.5l0.3-0.2c0.6-0.2,1.2-0.4,1.8-0.6c0.3-0.1,0.5-0.2,0.7-0.2c5.9-1.6,11.3-1.4,13.7-1.6h0.1 c16.3,0,18.2,14.5,18.2,25.4C770.7,68.7,760.2,73.2,751.5,73.2 M751.4,0c-0.2,0-0.5,0-0.7,0c-15.3,0-31,4.2-36.6,12.4 c-3,4-4.7,9-4.8,14.9l0,0V67c0,3.4-0.7,4.7-0.8,5l-0.9,1.7h-48.3V46.1h-0.1C658.6,17,641.4,1,616.5,1h-2.9h-21.4 c-1,7.1-1.8,12.1-2.8,19.2h24.2c12.7,0,19.4,10.8,19.4,27.4v27.8l-1.7-0.9c-0.3-0.1-2.4-0.8-5.7-0.8h-41.8 c-0.8,5.3-1.8,12.2-2.9,19.1h128.5c4.4-0.9,9.5-1.7,13.9-2.4c6.5,3.2,18.6,4.9,26.9,4.9c27.9,0,46-18.7,46-47.5 C796.1,19.3,778.6,0.6,751.4,0" />
                   <path fill="#27292D" d="M526.1,104.5h1.2c27.9,0,40.9-9.2,40.9-31.9c0-16.3-11.9-29.3-31.9-29.3h-25.7c-7.7,0-12.3-4.4-12.3-11.8 c0-5,1.9-11.2,14.5-11.2H569c1.2-7.3,1.8-11.9,2.9-19.2h-58.4c-27.2,0-40.9,11.4-40.9,30.4c0,18.8,11.9,28.6,31.9,28.6h25.7 c7.7,0,12.3,6.1,12.3,12.5c0,4.2-1.9,12.9-14.4,12.9h-4.3l-82.3-0.2l0,0h-15c-12.7,0-21.6-7.2-21.6-23.9V49.9 c0-17.4,6.9-28.2,21.6-28.2h24.4c1.1-7.4,1.8-12.1,2.8-19.1h-30.4h-2.9c-24.9,0-42.1,16.7-42.7,45.8l0,0v1.1v11.9 c0.6,29.1,17.8,43,42.7,43h2.9h21.4l44.6,0.1l0,0h26.6L526.1,104.5L526.1,104.5z" />
                 </svg>
-          مدى Mada
         </span>
 
-        <span className={chipClass}>
-          <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="#1a1f71" strokeWidth="2" aria-hidden="true">
-            <rect x="3" y="6" width="18" height="12" rx="2" />
-            <path d="M3 10h18" />
-          </svg>
-          Visa
+        {/* 2. VISA */}
+        <span className={badgeClass} title="Visa">
+          <svg className="h-4 w-auto" viewBox="0 0 50 16" fill="none" aria-label="Visa">
+                  <path fill="#1A1F71" d="M19.5 0.5L12.8 15.5H8.4L5.1 3.4C4.9 2.6 4.7 2.3 4.1 2C3.1 1.5 1.5 1 0.1 0.7L0.2 0.5H7.1C8 0.5 8.8 1.1 9 2.1L10.7 11.2L15.1 0.5H19.5ZM36.6 10.6C36.6 6.6 31 6.3 31.1 4.5C31.1 4 31.6 3.4 32.8 3.3C33.4 3.2 35 3.1 36.7 3.9L37.4 0.8C36.4 0.4 35.1 0.1 33.6 0.1C29.5 0.1 26.6 2.3 26.6 5.4C26.6 7.7 28.7 9 30.3 9.8C31.9 10.6 32.5 11.1 32.5 11.8C32.5 12.8 31.2 13.3 30.1 13.3C28 13.3 26.7 12.7 25.8 12.3L25 15.5C26 16 27.9 16.4 29.8 16.4C34.1 16.4 36.6 14.3 36.6 10.6ZM47.4 15.5H51.2L47.9 0.5H44.4C43.6 0.5 42.9 0.9 42.6 1.7L36.4 15.5H40.8L41.7 13H46.9L47.4 15.5ZM42.9 9.8L45 4.2L46.2 9.8H42.9ZM25.4 0.5L22 15.5H17.8L21.2 0.5H25.4Z" />
+                </svg>
         </span>
 
-        <span className={chipClass}>
-          <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" aria-hidden="true">
-            <circle cx="9" cy="12" r="6" fill="#eb001b" />
-            <circle cx="15" cy="12" r="6" fill="#f79e1b" />
-          </svg>
-          Mastercard
+        {/* 3. MASTERCARD */}
+        <span className={badgeClass} title="Mastercard">
+          <svg className="h-5 w-auto" viewBox="0 0 38 24" fill="none" aria-label="Mastercard">
+                  <circle cx="12" cy="12" r="12" fill="#EB001B" />
+                  <circle cx="26" cy="12" r="12" fill="#F79E1B" />
+                  <path fill="#FF5F00" d="M19 3.8a11.95 11.95 0 0 1 4.5 8.2A11.95 11.95 0 0 1 19 20.2a11.95 11.95 0 0 1-4.5-8.2A11.95 11.95 0 0 1 19 3.8z" />
+                </svg>
         </span>
 
-        <span className={chipClass}>
-          <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="#111827" strokeWidth="2" aria-hidden="true">
-            <rect x="3" y="5" width="18" height="14" rx="2" />
-            <path d="M7 12h10" />
-          </svg>
-          التحويل البنكي
+        {/* 4. BANK TRANSFER */}
+        <span className={badgeClass} title="التحويل البنكي">
+          <div className="flex items-center gap-1.5 text-[#1f2a44] font-bold text-xs">
+                  <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="#111827" strokeWidth="2" aria-hidden="true">
+                    <rect x="3" y="5" width="18" height="14" rx="2" />
+                    <path d="M7 12h10" />
+                  </svg>
+                  <span>التحويل البنكي</span>
+                </div>
         </span>
       </div>
     </div>
