@@ -43,7 +43,7 @@ export const Features: React.FC = () => {
             </div>
             <div>
               <h4 className="text-xs font-bold">استبدال واسترجاع ميسر</h4>
-              <p className="text-[11px] opacity-70 mt-0.5">إمكانية الاسترجاع خلال 14 يوماً بسهولة</p>
+              <p className="text-[11px] opacity-70 mt-0.5">استرجاع خلال 7 أيام واستبدال خلال 14 يوماً</p>
             </div>
           </div>
         </div>

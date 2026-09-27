@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, ShoppingBag, ShieldCheck, Phone } from 'lucide-react';
+import { Search, ShoppingBag } from 'lucide-react';
 import { storeConfig } from '../config/store';
 import { Logo } from './Logo';
 
@@ -17,26 +17,7 @@ export const Header: React.FC<HeaderProps> = ({
   setSearchQuery,
 }) => {
   return (
-    <header className="sticky top-0 z-40 bg-[#064e3b] text-white border-b border-[#047857] backdrop-blur-md shadow-lg">
-      <div className="bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 text-slate-950 font-black text-xs py-1.5 px-4">
-        <div className="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-2">
-          <div className="flex items-center gap-2">
-            <span className="bg-black/20 px-2 py-0.5 rounded text-[10px] font-bold">عرض حصري</span>
-            <span>شحن مجاني لكافة مدن المملكة للطلبات فوق {storeConfig.freeShippingThreshold} {storeConfig.currencySymbol}</span>
-          </div>
-          <div className="flex items-center gap-4 text-[11px]">
-            <span className="flex items-center gap-1">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              سجل تجاري: {storeConfig.cr}
-            </span>
-            <a href={`https://wa.me/${storeConfig.whatsapp}`} target="_blank" rel="noreferrer" className="flex items-center gap-1 hover:underline">
-              <Phone className="w-3.5 h-3.5" />
-              خدمة العملاء: {storeConfig.phone}
-            </a>
-          </div>
-        </div>
-      </div>
-
+    <header className="sticky top-0 z-40 bg-[#064e3b] text-white border-b border-[#047857]/50 backdrop-blur-md shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
         <div className="flex items-center justify-between gap-4">
           <a href="#" className="flex-shrink-0">
