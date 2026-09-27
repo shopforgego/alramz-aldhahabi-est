@@ -35,8 +35,10 @@
 
 * **منصة الاستضافة (Hosting Platform):** Vercel Platform (حساب devcoretwo)
 * **خوادم التشغيل (Edge Network):** Vercel Global Edge Network
-* **الدومين الرئيسي المعتمد (Primary Domain):** [https://alramz.shopforgego.com](https://alramz.shopforgego.com)
+* **الدومين الرئيسي المعتمد (Primary Domain):** [https://alramzgold.com](https://alramzgold.com)
 * **الدومينات المخصصة المعتمدة (Custom Domains):**
+  - [https://alramzgold.com](https://alramzgold.com)
+  - [https://www.alramzgold.com](https://www.alramzgold.com)
   - [https://alramz.shopforgego.com](https://alramz.shopforgego.com)
   - [https://alramz.protosoft.cloud](https://alramz.protosoft.cloud)
 * **رابط المعاينة السحابي (Vercel Preview):** [https://alramz-aldhahabi-est.vercel.app](https://alramz-aldhahabi-est.vercel.app)

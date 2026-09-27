@@ -128,7 +128,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenPolicies }) => {
             جميع الحقوق محفوظة © {new Date().getFullYear()} {storeConfig.companyNameAr}
           </div>
           <div>
-            المتجر الرسمي لقطع غيار وإكسسوارات السيارات المعتمد في المملكة العربية السعودية
+            المتجر الرسمي للساعات الفاخرة والمجوهرات والإكسسوارات الثمينة المعتمد في المملكة العربية السعودية
           </div>
         </div>
       </div>
