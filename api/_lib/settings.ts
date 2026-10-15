@@ -1,4 +1,4 @@
-import { dbQuery } from "./db";
+import { dbQuery } from "./db.js";
 
 export type PaymentRules = {
   minAmount: number;

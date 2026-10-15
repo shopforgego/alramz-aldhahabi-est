@@ -1,8 +1,8 @@
-import { clientIp, readJson, sendJson } from "../_lib/http";
-import { decryptCheckoutToken } from "../_lib/token";
-import { getPaymentRules } from "../_lib/settings";
-import { assertRateLimit, markLinkPaid, recordTransaction } from "../_lib/ledger";
-import { payWithApple, publicGatewayError } from "../_lib/mpgs";
+import { clientIp, readJson, sendJson } from "../_lib/http.js";
+import { decryptCheckoutToken } from "../_lib/token.js";
+import { getPaymentRules } from "../_lib/settings.js";
+import { assertRateLimit, markLinkPaid, recordTransaction } from "../_lib/ledger.js";
+import { payWithApple, publicGatewayError } from "../_lib/mpgs.js";
 
 export default async function handler(req: any, res: any) {
   if (req.method !== "POST") return sendJson(res, 405, { success: false, error: "Method not allowed" });

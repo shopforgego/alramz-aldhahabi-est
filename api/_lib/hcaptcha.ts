@@ -1,4 +1,4 @@
-import { config } from "./config";
+import { config } from "./config.js";
 
 export async function verifyHcaptcha(token: string | undefined | null, remoteIp?: string) {
   const secret = config.hcaptchaSecret;

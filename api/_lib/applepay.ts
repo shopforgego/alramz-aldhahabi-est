@@ -1,7 +1,7 @@
 import fs from "fs";
 import https from "https";
 import path from "path";
-import { ALLOWED_HOSTS, config } from "./config";
+import { ALLOWED_HOSTS, config } from "./config.js";
 
 function readFirst(paths: string[]) {
   for (const file of paths) {

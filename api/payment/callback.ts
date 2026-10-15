@@ -1,6 +1,6 @@
-import { decryptCheckoutToken } from "../_lib/token";
-import { markLinkPaid, recordTransaction } from "../_lib/ledger";
-import { processPayment, publicGatewayError } from "../_lib/mpgs";
+import { decryptCheckoutToken } from "../_lib/token.js";
+import { markLinkPaid, recordTransaction } from "../_lib/ledger.js";
+import { processPayment, publicGatewayError } from "../_lib/mpgs.js";
 
 function page(title: string, message: string, target: string) {
   return `<!DOCTYPE html><html lang="ar"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title}</title></head>

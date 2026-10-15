@@ -1,5 +1,5 @@
-import { dbQuery } from "./db";
-import { getPaymentRules } from "./settings";
+import { dbQuery } from "./db.js";
+import { getPaymentRules } from "./settings.js";
 
 export function invoiceTotal(link: { items?: any[]; vatRate?: number; paymentChargeRate?: number }) {
   const subtotal = (link.items || []).reduce(

@@ -1,5 +1,5 @@
-import { sendJson } from "./_lib/http";
-import { getPaymentRules } from "./_lib/settings";
+import { sendJson } from "./_lib/http.js";
+import { getPaymentRules } from "./_lib/settings.js";
 
 export default async function handler(req: any, res: any) {
   if (req.method !== "GET") return sendJson(res, 405, { success: false, error: "Method not allowed" });

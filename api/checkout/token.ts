@@ -1,8 +1,8 @@
-import { clientIp, readJson, sendJson } from "../_lib/http";
-import { verifyHcaptcha } from "../_lib/hcaptcha";
-import { getPaymentRules } from "../_lib/settings";
-import { encryptCheckoutToken, decryptCheckoutToken } from "../_lib/token";
-import { getLink } from "../_lib/ledger";
+import { clientIp, readJson, sendJson } from "../_lib/http.js";
+import { verifyHcaptcha } from "../_lib/hcaptcha.js";
+import { getPaymentRules } from "../_lib/settings.js";
+import { encryptCheckoutToken, decryptCheckoutToken } from "../_lib/token.js";
+import { getLink } from "../_lib/ledger.js";
 
 export default async function handler(req: any, res: any) {
   if (req.method === "GET") {

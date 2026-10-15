@@ -1,4 +1,4 @@
-import { config } from "./config";
+import { config } from "./config.js";
 
 function authHeader() {
   return `Basic ${Buffer.from(`merchant.${config.merchantId}:${config.apiPassword}`).toString("base64")}`;

@@ -1,6 +1,6 @@
-import { sendJson } from "./_lib/http";
-import { getLink } from "./_lib/ledger";
-import { getPaymentRules } from "./_lib/settings";
+import { sendJson } from "./_lib/http.js";
+import { getLink } from "./_lib/ledger.js";
+import { getPaymentRules } from "./_lib/settings.js";
 
 export default async function handler(req: any, res: any) {
   if (req.method !== "GET") return sendJson(res, 405, { success: false, error: "Method not allowed" });
