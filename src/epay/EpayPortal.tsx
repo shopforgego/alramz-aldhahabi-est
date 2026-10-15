@@ -172,7 +172,7 @@ export function EpayPortal() {
 
         <form onSubmit={onSubmit} className="bg-white rounded-3xl border border-[#e7d7b1] shadow-xl shadow-amber-900/5 overflow-hidden">
           <div className="bg-gradient-to-r from-[#064e3b] via-[#0b6b52] to-[#d4a24c] text-white px-5 py-3.5 text-sm font-bold">
-            {ar ? "خصم إضافي 5% عند الدفع الإلكتروني المباشر" : "Automatic 5% consideration on direct electronic checkout"}
+            {ar ? "خصم إضافي 5% عند الدفع الإلكتروني المباشر" : "Extra 5% on direct electronic checkout"}
           </div>
           <div className="p-5 sm:p-7 space-y-4">
             <Field label={ar ? "اسم العميل / المؤسسة" : "Full Name / Organization"}>

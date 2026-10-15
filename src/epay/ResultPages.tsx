@@ -100,7 +100,7 @@ export function InvoicePage() {
         {error && <p className="mt-4 rounded-xl bg-red-50 p-3 text-sm text-red-700">{error}</p>}
         {link && (
           <form className="mt-5 space-y-3" onSubmit={(e) => { e.preventDefault(); setLoading(true); setCaptcha(true); }}>
-            <p className="text-3xl font-black">{Number(link.total).toLocaleString()} ر.س</p>
+            <p className="text-3xl font-black" dir="ltr">{Number(link.total).toLocaleString("en-US", { minimumFractionDigits: 2 })} ر.س</p>
             <p className="text-sm text-stone-600">{link.title}</p>
             {link.status !== "ACTIVE" && <p className="text-sm font-bold text-amber-700">حالة الفاتورة: {link.status}</p>}
             <input required className="w-full rounded-xl border px-3 py-3 text-sm" placeholder="الاسم" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
