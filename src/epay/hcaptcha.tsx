@@ -7,7 +7,6 @@ declare global {
   interface Window {
     hcaptcha?: {
       render: (el: HTMLElement, opts: Record<string, unknown>) => string;
-      reset: (id?: string) => void;
       remove: (id: string) => void;
     };
     __hcaptchaLoading?: Promise<void>;
@@ -76,13 +75,15 @@ export function HcaptchaModal({
 
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-[80] bg-black/55 flex items-end sm:items-center justify-center p-4" role="dialog" aria-modal="true">
-      <div className="w-full max-w-md rounded-3xl bg-[#fbfbf8] border border-amber-200 shadow-2xl p-5">
-        <p className="text-sm font-bold text-[#064e3b] mb-4 text-center">
-          {lang === "ar" ? "خطوة أخيرة قبل إتمام الدفع. أكمل التحقق أدناه." : "One more step before continuing. Complete the check below."}
+    <div className="fixed inset-0 z-[1000] bg-black/45 flex items-center justify-center p-4" role="dialog" aria-modal="true">
+      <div className="bg-white rounded-xl px-5 pt-6 pb-5 w-full max-w-[360px] shadow-[0_8px_32px_rgba(0,0,0,0.18)] flex flex-col items-center gap-4 text-center">
+        <p className="m-0 text-[15px] font-medium text-[#1a1a1a] leading-snug">
+          {lang === "ar"
+            ? "خطوة أخيرة قبل إتمام الدفع. أكمل التحقق أدناه."
+            : "One more step before finishing. Complete the check below."}
         </p>
-        <div className="flex justify-center min-h-[78px]" ref={host} />
-        <button type="button" onClick={onCancel} className="mt-4 w-full rounded-xl border border-stone-300 py-2.5 text-sm font-bold text-stone-700">
+        <div ref={host} className="flex justify-center w-full min-h-[78px]" />
+        <button type="button" onClick={onCancel} className="bg-transparent border-0 text-[#4a4a4a] text-sm font-medium px-3 py-2">
           {lang === "ar" ? "إلغاء" : "Cancel"}
         </button>
       </div>
