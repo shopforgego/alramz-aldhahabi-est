@@ -181,10 +181,8 @@ export function EpayPortal() {
               <span className="font-extrabold text-sm sm:text-base text-slate-900 group-hover:text-blue-600 transition-colors">
                 {ar ? storeConfig.companyNameAr : storeConfig.companyNameEn}
               </span>
-              <span className="text-[11px] font-medium text-slate-500 flex items-center gap-1.5 flex-wrap">
-                <span>{ar ? `سجل تجاري: ${storeConfig.cr}` : `CR: ${storeConfig.cr}`}</span>
-                <span className="text-slate-300">•</span>
-                <span>{ar ? "تجارة الساعات والمجوهرات" : "Watches & Jewelry"}</span>
+              <span className="text-[11px] font-medium text-slate-500">
+                {ar ? "تجارة الساعات والمجوهرات" : "Watches & Jewelry"}
               </span>
             </div>
           </a>
@@ -349,8 +347,8 @@ export function EpayPortal() {
         <div className="max-w-4xl mx-auto px-4 space-y-2">
           <p>
             {ar
-              ? `جميع الحقوق محفوظة © ${new Date().getFullYear()} ${storeConfig.companyNameAr} • سجل تجاري: ${storeConfig.cr}`
-              : `All rights reserved © ${new Date().getFullYear()} ${storeConfig.companyNameEn} • CR: ${storeConfig.cr}`}
+              ? `جميع الحقوق محفوظة © ${new Date().getFullYear()} ${storeConfig.companyNameAr}`
+              : `All rights reserved © ${new Date().getFullYear()} ${storeConfig.companyNameEn}`}
           </p>
           <div className="flex justify-center gap-4 text-slate-400 text-[11px]">
             <a href="/" className="hover:text-slate-700">{ar ? "الشروط والأحكام" : "Terms & Conditions"}</a>

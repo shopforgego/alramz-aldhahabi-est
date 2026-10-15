@@ -105,9 +105,17 @@ export async function authenticatePayer(opts: {
   amount: string;
   authTxn: string;
   payTxn: string;
+  checkoutToken?: string;
   device?: any;
 }) {
-  const callback = `${config.appUrl}/api/payment/callback?orderId=${encodeURIComponent(opts.orderId)}&sessionId=${encodeURIComponent(opts.sessionId)}&amount=${encodeURIComponent(opts.amount)}&authTransactionId=${encodeURIComponent(opts.authTxn)}&payTransactionId=${encodeURIComponent(opts.payTxn)}`;
+  const callbackUrl = new URL(`${config.appUrl}/api/payment/callback`);
+  callbackUrl.searchParams.set("orderId", opts.orderId);
+  callbackUrl.searchParams.set("sessionId", opts.sessionId);
+  callbackUrl.searchParams.set("amount", opts.amount);
+  callbackUrl.searchParams.set("authTransactionId", opts.authTxn);
+  callbackUrl.searchParams.set("payTransactionId", opts.payTxn);
+  if (opts.checkoutToken) callbackUrl.searchParams.set("token", opts.checkoutToken);
+  const callback = callbackUrl.toString();
   return gateway("PUT", `/api/rest/version/${config.apiVersion}/merchant/${config.merchantId}/order/${opts.orderId}/transaction/${opts.authTxn}`, {
     apiOperation: "AUTHENTICATE_PAYER",
     authentication: { redirectResponseUrl: callback },

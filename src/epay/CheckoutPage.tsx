@@ -81,18 +81,39 @@ export function CheckoutPage() {
   }, [ar, lang]);
 
   useEffect(() => {
-    if (!token) {
+    const search = new URLSearchParams(window.location.search);
+    let activeToken = token;
+    if (!activeToken) {
+      try {
+        const saved = sessionStorage.getItem("alramz_checkout_token") || "";
+        if (saved) {
+          search.set("token", saved);
+          window.location.replace(`/epay/checkout?${search.toString()}`);
+          return;
+        }
+      } catch {
+        /* ignore */
+      }
       setInvalid(true);
       setError(ar ? "رابط الدفع غير صالح." : "This payment link is invalid.");
       return;
     }
-    fetch(`/api/checkout/token?token=${encodeURIComponent(token)}`)
+    try {
+      sessionStorage.setItem("alramz_checkout_token", activeToken);
+    } catch {
+      /* ignore */
+    }
+    const bankError = search.get("error");
+    if (bankError) setError(bankError);
+    fetch(`/api/checkout/token?token=${encodeURIComponent(activeToken)}`)
       .then((r) => r.json())
       .then((data) => {
         if (!data.success) {
           if (String(data.error || "").toLowerCase().includes("unavailable")) setDisabled(true);
+          const message = data.error || (ar ? "تعذر فتح جلسة الدفع." : "Unable to open this payment session.");
+          const expiredSession = /expir/i.test(message);
           setInvalid(true);
-          setError(data.error || (ar ? "رابط الفاتورة غير متاح أو تم إيقافه" : "Payment link not found or expired"));
+          setError(expiredSession ? (ar ? "انتهت مهلة الدفع. ابدأ العملية من جديد." : "This payment session has expired. Please start again.") : message);
           return;
         }
         const next = data.order as Order;
@@ -461,10 +482,12 @@ export function CheckoutPage() {
             </div>
             <div>
               <strong className="block font-bold text-sm text-rose-900">
-                {ar ? "رابط الفاتورة غير متاح أو تم إيقافه" : "Payment link not found or expired"}
+                {/expir|انتهت/i.test(error)
+                  ? (ar ? "انتهت مهلة هذا الدفع" : "This payment session has expired")
+                  : (ar ? "تعذر فتح جلسة الدفع" : "Unable to open this payment session")}
               </strong>
               <p className="text-xs text-rose-700 mt-1 leading-relaxed max-w-sm mx-auto">
-                {error || (ar ? "هذا الرابط لم يعد متاحاً للسداد أو تم حذفه/إيقافه من قبل الإدارة." : "This invoice link is no longer valid or has been deactivated by administration.")}
+                {error || (ar ? "ارجع لصفحة البيانات وابدأ الدفع من جديد." : "Go back and start the payment again.")}
               </p>
             </div>
           </div>

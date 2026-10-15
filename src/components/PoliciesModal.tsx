@@ -73,7 +73,7 @@ export const PoliciesModal: React.FC<PoliciesModalProps> = ({
             <div className="space-y-3">
               <h4 className="font-bold text-white text-sm">سياسة الاسترجاع والاستبدال واسترداد الأموال:</h4>
               <p>
-                تخضع جميع عمليات الاسترجاع والاستبدال واسترداد الأموال في <strong>{storeConfig.storeNameAr}</strong> التابع لـ <strong>{storeConfig.companyNameAr}</strong> (سجل تجاري: {storeConfig.cr}) للضوابط المنصوص عليها في اللائحة التنفيذية لنظام التجارة الإلكترونية الصادر عن وزارة التجارة بالمملكة العربية السعودية واشتراطات بوابات الدفع الإلكتروني المعتمدة:
+                تخضع جميع عمليات الاسترجاع والاستبدال واسترداد الأموال في <strong>{storeConfig.storeNameAr}</strong> التابع لـ <strong>{storeConfig.companyNameAr}</strong> للضوابط المنصوص عليها في اللائحة التنفيذية لنظام التجارة الإلكترونية الصادر عن وزارة التجارة بالمملكة العربية السعودية واشتراطات بوابات الدفع الإلكتروني المعتمدة:
               </p>
               <ul className="list-disc pr-5 space-y-2 text-slate-400">
                 <li>
@@ -125,7 +125,7 @@ export const PoliciesModal: React.FC<PoliciesModalProps> = ({
             <div className="space-y-3">
               <h4 className="font-bold text-white text-sm">الشروط والأحكام العامة:</h4>
               <p>
-                باستخدامك لموقع <strong>{storeConfig.storeNameAr}</strong> التابع لـ <strong>{storeConfig.companyNameAr}</strong> (سجل تجاري رقم: {storeConfig.cr}) ومقرها الرئيسي: {storeConfig.city}، فإنك توافق على الالتزام بالشروط والأحكام التالية:
+                باستخدامك لموقع <strong>{storeConfig.storeNameAr}</strong> التابع لـ <strong>{storeConfig.companyNameAr}</strong> ومقرها الرئيسي: {storeConfig.city}، فإنك توافق على الالتزام بالشروط والأحكام التالية:
               </p>
               <ul className="list-disc pr-5 space-y-2 text-slate-400">
                 <li>

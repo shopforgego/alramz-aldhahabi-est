@@ -78,6 +78,7 @@ export default async function handler(req: any, res: any) {
       amount: order.amount,
       authTxn,
       payTxn,
+      checkoutToken: String(body.token || ""),
       device: body.device,
     });
     const challenge = auth?.authentication?.redirect?.html;

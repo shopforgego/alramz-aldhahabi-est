@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldCheck, Phone, Mail, MapPin, FileText } from 'lucide-react';
+import { Phone, Mail, MapPin, FileText } from 'lucide-react';
 import { storeConfig } from '../config/store';
 import { Logo } from './Logo';
 
@@ -19,10 +19,6 @@ export const Footer: React.FC<FooterProps> = ({ onOpenPolicies }) => {
               {storeConfig.taglineAr}
             </p>
             <div className="pt-2 border-t border-slate-900 space-y-1.5 text-[11px] text-slate-400">
-              <div className="flex items-center gap-1.5 text-amber-400 font-bold">
-                <ShieldCheck className="w-4 h-4" />
-                <span>السجل التجاري الموحد: {storeConfig.cr}</span>
-              </div>
               <div>الرقم الضريبي: {storeConfig.taxNumber}</div>
               <div>الكيان: مؤسسة تجارية سعودية نشطة معتمدة</div>
             </div>
