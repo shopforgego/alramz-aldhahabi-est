@@ -85,9 +85,7 @@ function message(data: Notice, lang: "ar" | "en") {
   return { subject, text, html };
 }
 
-export async function dispatchTransactionNotifications(data: Notice) {
-  const status = String(data.status || "").toUpperCase();
-  if (status !== "SUCCESS" && status !== "FAILED") return;
+async function sendEmails(data: Notice, status: "SUCCESS" | "FAILED") {
   const transport = mailer();
   if (!transport) {
     console.error("[notify] SMTP is not configured");
@@ -111,4 +109,64 @@ export async function dispatchTransactionNotifications(data: Notice) {
       });
     })
   );
+}
+
+/** Same Expo channel the PayOps app uses. Expo delivers it through FCM on Android and APNs on iPhone. */
+async function sendPush(data: Notice, status: "SUCCESS" | "FAILED") {
+  const column = status === "SUCCESS" ? "notify_success" : "notify_failed";
+  const registered = await dbQuery(
+    `SELECT expo_push_token FROM device_push_tokens WHERE is_active = true AND ${column} = true`
+  );
+  const tokens = registered.rows
+    .map((row: { expo_push_token?: string }) => row.expo_push_token || "")
+    .filter((token: string) => token.startsWith("ExponentPushToken"));
+  if (!tokens.length) return;
+
+  const amount = money(data.amount);
+  const success = status === "SUCCESS";
+  const title = success ? "عملية سداد ناجحة" : "عملية سداد فاشلة";
+  const body = success
+    ? `تم استلام ${amount} ر.س${data.customerName ? ` من ${data.customerName}` : ""} — الرمز الذهبي`
+    : `فشلت عملية بمبلغ ${amount} ر.س${data.orderId ? ` — ${data.orderId}` : ""}`;
+  const messages = tokens.map((to: string) => ({
+    to,
+    sound: "default",
+    title,
+    body,
+    priority: "high",
+    channelId: "payments",
+    data: {
+      type: "transaction",
+      status,
+      orderId: data.orderId,
+      amount: Number(data.amount) || 0,
+      currency: "SAR",
+      orgId: "alramz-aldhahabi",
+    },
+  }));
+
+  for (let i = 0; i < messages.length; i += 100) {
+    const chunk = messages.slice(i, i + 100);
+    const pushRes = await fetch("https://exp.host/--/api/v2/push/send", {
+      method: "POST",
+      headers: { Accept: "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify(chunk),
+    });
+    if (!pushRes.ok) {
+      console.error("[notify] push HTTP", pushRes.status, await pushRes.text().catch(() => ""));
+      continue;
+    }
+    const json = await pushRes.json().catch(() => null);
+    const tickets = Array.isArray(json?.data) ? json.data : [];
+    for (const ticket of tickets) {
+      if (ticket?.status === "error") console.error("[notify] push ticket", ticket.message, ticket.details);
+    }
+  }
+}
+
+export async function dispatchTransactionNotifications(data: Notice) {
+  const status = String(data.status || "").toUpperCase();
+  if (status !== "SUCCESS" && status !== "FAILED") return;
+  const notice = { ...data, status };
+  await Promise.allSettled([sendEmails(notice, status), sendPush(notice, status)]);
 }
