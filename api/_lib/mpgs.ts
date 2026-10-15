@@ -69,8 +69,8 @@ export async function createCardSession(params: {
       customer: {
         firstName: parts[0] || "Customer",
         lastName: parts.slice(1).join(" ") || ".",
-        email: params.email || "allhybynjwd@gmail.com",
-        phone: params.phone || "+966555374408",
+        email: params.email || "checkout@alramzgold.com",
+        ...(params.phone ? { phone: params.phone } : {}),
       },
       sourceOfFunds: {
         provided: {
@@ -182,8 +182,8 @@ export async function payWithApple(params: {
     customer: {
       firstName: parts[0] || "Customer",
       lastName: parts.slice(1).join(" ") || ".",
-      email: params.email || "allhybynjwd@gmail.com",
-      phone: params.phone || "+966555374408",
+      email: params.email || "checkout@alramzgold.com",
+      ...(params.phone ? { phone: params.phone } : {}),
     },
     sourceOfFunds: {
       type: "CARD",

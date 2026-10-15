@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle2, MessageCircle, ArrowRight, Printer } from 'lucide-react';
+import { CheckCircle2, ArrowRight } from 'lucide-react';
 import { storeConfig } from '../config/store';
 
 interface OrderSuccessModalProps {
@@ -12,10 +12,6 @@ export const OrderSuccessModal: React.FC<OrderSuccessModalProps> = ({
   onClose,
 }) => {
   if (!orderData) return null;
-
-  const whatsappMsg = encodeURIComponent(
-    `مرحباً ${storeConfig.companyNameAr}، أود تأكيد طلبي رقم: ${orderData.orderNumber}\nالاسم: ${orderData.customer.fullName}\nالإجمالي: ${orderData.total} ${storeConfig.currencySymbol}`
-  );
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4">
@@ -47,16 +43,6 @@ export const OrderSuccessModal: React.FC<OrderSuccessModalProps> = ({
         </div>
 
         <div className="flex flex-col gap-2.5">
-          <a
-            href={`https://wa.me/${storeConfig.whatsapp}?text=${whatsappMsg}`}
-            target="_blank"
-            rel="noreferrer"
-            className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl text-xs transition"
-          >
-            <MessageCircle className="w-4 h-4" />
-            <span>متابعة حالة الشحن عبر واتساب</span>
-          </a>
-
           <button
             onClick={onClose}
             className="flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-2.5 px-4 rounded-xl text-xs transition"

@@ -115,7 +115,7 @@ export const PoliciesModal: React.FC<PoliciesModalProps> = ({
                   <strong className="text-white">رسوم الشحن للطلبات الأقل:</strong> يتم تطبيق رسوم توصيل رمزية ثابتة قدرها <strong>{storeConfig.shippingCost} {storeConfig.currencySymbol}</strong> فقط.
                 </li>
                 <li>
-                  <strong className="text-white">تغليف آمن وتتبع لحظي:</strong> يتم تغليف كل قطعة ثمينة داخل عبوة مبطنة ومحكمة الإغلاق ومؤمنة بالكامل، مع إرسال رابط التتبع المباشر إلى رقم جوال العميل عبر الرسائل النصية وواتساب فور تسليم الشحنة للناقل.
+                  <strong className="text-white">تغليف آمن وتتبع لحظي:</strong> يتم تغليف كل قطعة ثمينة داخل عبوة مبطنة ومحكمة الإغلاق ومؤمنة بالكامل، مع إرسال رابط التتبع المباشر إلى رقم جوال العميل فور تسليم الشحنة للناقل.
                 </li>
               </ul>
             </div>
@@ -125,7 +125,7 @@ export const PoliciesModal: React.FC<PoliciesModalProps> = ({
             <div className="space-y-3">
               <h4 className="font-bold text-white text-sm">الشروط والأحكام العامة:</h4>
               <p>
-                باستخدامك لموقع <strong>{storeConfig.storeNameAr}</strong> التابع لـ <strong>{storeConfig.companyNameAr}</strong> ومقرها الرئيسي: {storeConfig.city}، فإنك توافق على الالتزام بالشروط والأحكام التالية:
+                باستخدامك لموقع <strong>{storeConfig.storeNameAr}</strong> التابع لـ <strong>{storeConfig.companyNameAr}</strong>، فإنك توافق على الالتزام بالشروط والأحكام التالية:
               </p>
               <ul className="list-disc pr-5 space-y-2 text-slate-400">
                 <li>
@@ -164,7 +164,7 @@ export const PoliciesModal: React.FC<PoliciesModalProps> = ({
                   <strong className="text-white">عدم مشاركة البيانات:</strong> نلتزم التزاماً تاماً بعدم بيع أو تأجير أو مشاركة بيانات عملائنا مع أي جهات تسويقية خارجية، ويقتصر استخدامها حصراً على تنفيذ طلبك عبر شركات الشحن المرخصة.
                 </li>
                 <li>
-                  <strong className="text-white">حقوق العميل:</strong> يحق للعميل طلب الاطلاع على بياناته أو تعديلها أو حذفها في أي وقت عبر التواصل مع فريق خدمة العملاء على البريد: <span className="text-amber-400">{storeConfig.email}</span> أو عبر الواتساب: <span className="text-amber-400" dir="ltr">+{storeConfig.whatsapp}</span>.
+                  <strong className="text-white">حقوق العميل:</strong> يحق للعميل طلب الاطلاع على بياناته أو تعديلها أو حذفها في أي وقت، وتتم معالجة الطلب وفق نظام حماية البيانات الشخصية.
                 </li>
               </ul>
             </div>

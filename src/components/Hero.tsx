@@ -55,7 +55,6 @@ export const Hero: React.FC<HeroProps> = ({
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-6 text-white">
                 <span className="text-xs font-bold opacity-80 mb-1">{storeConfig.companyNameAr}</span>
                 <h3 className="text-base font-extrabold">{storeConfig.taglineAr}</h3>
-                <p className="text-[11px] opacity-75 mt-1">المقر: {storeConfig.city}</p>
               </div>
             </div>
           </div>
