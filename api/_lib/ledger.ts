@@ -1,4 +1,5 @@
 import { dbQuery } from "./db.js";
+import { dispatchTransactionNotifications } from "./notify.js";
 import { getPaymentRules } from "./settings.js";
 
 export function invoiceTotal(link: { items?: any[]; vatRate?: number; paymentChargeRate?: number }) {
@@ -115,6 +116,27 @@ export async function recordTransaction(data: {
       data.rawResponse ? JSON.stringify(data.rawResponse) : null,
     ]
   );
+
+  if (data.status === "SUCCESS" || data.status === "FAILED") {
+    try {
+      await dispatchTransactionNotifications({
+        orderId: data.orderId,
+        amount,
+        status: data.status,
+        paymentMethod: data.paymentMethod,
+        cardBrand: data.cardBrand,
+        cardLast4: data.cardLast4,
+        customerName: data.customerName,
+        customerEmail: data.customerEmail,
+        customerPhone: data.customerPhone,
+        authCode: data.authCode,
+        receiptNumber: data.receiptNumber,
+        errorMessage: data.errorMessage,
+      });
+    } catch (err: any) {
+      console.error("[notify] payment email failed:", err?.message || err);
+    }
+  }
 }
 
 export async function assertRateLimit(ip: string) {
