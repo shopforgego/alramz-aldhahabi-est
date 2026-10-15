@@ -33,6 +33,9 @@ export const Footer: React.FC<FooterProps> = ({ onOpenPolicies }) => {
             <h4 className="text-white font-extrabold text-sm mb-3">روابط هامة وسياسات</h4>
             <ul className="space-y-2">
               <li>
+                <a href="/epay" className="hover:text-amber-400 transition font-bold text-amber-200">بوابة الدفع الإلكتروني</a>
+              </li>
+              <li>
                 <button onClick={() => onOpenPolicies('returns')} className="hover:text-amber-400 transition">
                   سياسة الاستبدال والاسترجاع
                 </button>

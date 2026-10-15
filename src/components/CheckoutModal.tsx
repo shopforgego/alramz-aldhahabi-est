@@ -39,6 +39,16 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
       alert('يرجى ملء جميع الحقول الإلزامية (الاسم، الجوال، الحي)');
       return;
     }
+    if (paymentMethod !== 'cod') {
+      const q = new URLSearchParams({
+        amount: total.toFixed(2),
+        name: formData.fullName,
+        phone: formData.phone,
+        lang: 'ar',
+      });
+      window.location.href = `/epay?${q.toString()}`;
+      return;
+    }
     const orderNumber = `WRD-${Math.floor(100000 + Math.random() * 900000)}`;
     onOrderSuccess({
       orderNumber,

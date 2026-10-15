@@ -48,6 +48,16 @@
 
 ## 💳 4. معلومات بوابات الدفع الإلكتروني (Payment Gateways & Credentials)
 
+بوابة الإنتاج المعتمدة هي **Mastercard Payment Gateway (البنك الأهلي / KSA)** مع Apple Pay.
+
+* **صفحة إدخال بيانات العميل:** `https://www.alramzgold.com/epay`
+* **صفحة البطاقة و Apple Pay:** `https://www.alramzgold.com/epay/checkout`
+* **الفواتير المغلقة من لوحة التحكم:** `https://www.alramzgold.com/sa?short=BS-...`
+* **معرف التاجر:** `602379206`
+* **الحماية:** hCaptcha قبل إنشاء جلسة الدفع
+* **قاعدة البيانات:** `alramz_aldhahabi_db`
+* كلمة مرور الواجهة والشهادات تُضبط في متغيرات Vercel ولا تُكتب هنا.
+
 ### 1️⃣ بوابة تيلر (Telr)
 * **حالة التفعيل والربط:** قيد الاشتراك والتفعيل (Pending / Inactive)
 * **معرف المتجر (Store ID):** `-`
