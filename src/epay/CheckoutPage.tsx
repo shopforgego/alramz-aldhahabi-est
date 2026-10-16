@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { AlertCircle, Lock, RefreshCw, X } from "lucide-react";
+import { AlertCircle, Loader2, Lock, RefreshCw, ShieldCheck, X } from "lucide-react";
 import { storeConfig } from "../config/store";
 
 const LANGUAGES_LIST = [
@@ -74,6 +74,90 @@ export function CheckoutPage() {
   const [card, setCard] = useState({ name: "", number: "", expiry: "", cvv: "" });
   const challengeRef = useRef<HTMLDivElement>(null);
   const ar = lang === "ar";
+
+  /* ── Bank Checkout PIN Gate ── */
+  const [checkoutPinRequired, setCheckoutPinRequired] = useState<boolean | null>(null);
+  const [pinVerified, setPinVerified] = useState(false);
+  const [pinDigits, setPinDigits] = useState(["", "", "", ""]);
+  const [pinError, setPinError] = useState("");
+  const [pinLoading, setPinLoading] = useState(false);
+  const pinRefs = useRef<(HTMLInputElement | null)[]>([null, null, null, null]);
+
+  useEffect(() => {
+    fetch("/api/settings")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.settings) {
+          if (data.settings.enableCheckoutPage === false) {
+            setDisabled(true);
+            return;
+          }
+          setCheckoutPinRequired(Boolean(data.settings.checkoutPinRequired));
+        } else {
+          setCheckoutPinRequired(false);
+        }
+      })
+      .catch(() => {
+        setCheckoutPinRequired(false);
+      });
+  }, []);
+
+  const handlePinChange = (index: number, value: string) => {
+    if (value && !/^\d$/.test(value)) return;
+    setPinError("");
+    setPinDigits((prev) => {
+      const next = [...prev];
+      next[index] = value;
+      return next;
+    });
+    if (value && index < 3) {
+      pinRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handlePinKeyDown = (index: number, e: React.KeyboardEvent) => {
+    if (e.key === "Backspace" && !pinDigits[index] && index > 0) {
+      pinRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handlePinPaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 4);
+    if (pasted.length === 4) {
+      setPinDigits(pasted.split(""));
+      pinRefs.current[3]?.focus();
+    }
+  };
+
+  const submitPin = async () => {
+    const code = pinDigits.join("");
+    if (code.length !== 4) {
+      setPinError(ar ? "يرجى إدخال الرمز المكون من 4 أرقام" : "Please enter the 4-digit PIN");
+      return;
+    }
+    setPinLoading(true);
+    setPinError("");
+    try {
+      const res = await fetch("/api/portal/verify-pin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pin: code, type: "checkout" }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setPinVerified(true);
+      } else {
+        setPinError(data.error || (ar ? "رمز PIN غير صحيح" : "Incorrect PIN"));
+        setPinDigits(["", "", "", ""]);
+        pinRefs.current[0]?.focus();
+      }
+    } catch {
+      setPinError(ar ? "حدث خطأ في الاتصال" : "Connection error");
+    } finally {
+      setPinLoading(false);
+    }
+  };
 
   useEffect(() => {
     document.documentElement.dir = ar ? "rtl" : "ltr";
@@ -361,6 +445,69 @@ export function CheckoutPage() {
         <div className="flex items-center space-x-4 divide-x divide-slate-300">
           <h1 className="text-2xl font-bold px-4 tracking-tight">404</h1>
           <div className="px-4 text-sm text-slate-600 font-normal">This page could not be found.</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (checkoutPinRequired === null) {
+    return (
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100vh" }}>
+        <Loader2 className="h-8 w-8 animate-spin" style={{ color: "#0053a4" }} />
+      </div>
+    );
+  }
+
+  if (checkoutPinRequired && !pinVerified) {
+    return (
+      <div className="pin-gate-overlay">
+        <div className="pin-gate-card">
+          <div className="pin-gate-icon">
+            <Lock className="h-10 w-10" style={{ color: "#0053a4" }} />
+          </div>
+          <h2 className="pin-gate-title">{ar ? "رمز الدخول" : "Security PIN"}</h2>
+          <p className="pin-gate-subtitle">
+            {ar
+              ? "أدخل رمز PIN المكون من 4 أرقام للوصول إلى صفحة الدفع البنكي"
+              : "Enter the 4-digit PIN to access the checkout page"}
+          </p>
+          <div className="pin-gate-inputs" dir="ltr">
+            {pinDigits.map((digit, i) => (
+              <input
+                key={i}
+                ref={(el) => { pinRefs.current[i] = el; }}
+                type="tel"
+                inputMode="numeric"
+                maxLength={1}
+                className={`pin-gate-digit${pinError ? " pin-gate-digit--error" : ""}`}
+                value={digit}
+                onChange={(e) => handlePinChange(i, e.target.value)}
+                onKeyDown={(e) => handlePinKeyDown(i, e)}
+                onPaste={i === 0 ? handlePinPaste : undefined}
+                autoFocus={i === 0}
+                aria-label={`PIN digit ${i + 1}`}
+                disabled={pinLoading}
+              />
+            ))}
+          </div>
+          {pinError && (
+            <p className="pin-gate-error">{pinError}</p>
+          )}
+          <button
+            type="button"
+            className="pin-gate-submit"
+            onClick={submitPin}
+            disabled={pinLoading || pinDigits.join("").length !== 4}
+          >
+            {pinLoading ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              <>
+                <ShieldCheck className="h-5 w-5" />
+                <span>{ar ? "تحقق" : "Verify"}</span>
+              </>
+            )}
+          </button>
         </div>
       </div>
     );

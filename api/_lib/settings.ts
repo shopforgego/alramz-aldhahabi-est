@@ -11,6 +11,10 @@ export type PaymentRules = {
   enableCheckoutPage: boolean;
   enableEpayPortal: boolean;
   ipVelocityPerMinute: number;
+  enablePortalPin?: boolean;
+  portalPinCode?: string;
+  enableCheckoutPin?: boolean;
+  checkoutPinCode?: string;
 };
 
 const DEFAULTS: PaymentRules = {
@@ -24,6 +28,10 @@ const DEFAULTS: PaymentRules = {
   enableCheckoutPage: true,
   enableEpayPortal: true,
   ipVelocityPerMinute: 8,
+  enablePortalPin: true,
+  portalPinCode: "3975",
+  enableCheckoutPin: false,
+  checkoutPinCode: "1234",
 };
 
 export async function getPaymentRules(): Promise<PaymentRules> {
@@ -45,6 +53,10 @@ export async function getPaymentRules(): Promise<PaymentRules> {
       enableCheckoutPage: parsed.enableCheckoutPage !== false,
       enableEpayPortal: parsed.enableEpayPortal !== false,
       ipVelocityPerMinute: Number(parsed.ipVelocityPerMinute ?? DEFAULTS.ipVelocityPerMinute),
+      enablePortalPin: parsed.enablePortalPin !== false,
+      portalPinCode: String(parsed.portalPinCode ?? "3975"),
+      enableCheckoutPin: Boolean(parsed.enableCheckoutPin),
+      checkoutPinCode: String(parsed.checkoutPinCode ?? "1234"),
     };
   } catch (err) {
     console.error("settings read failed", err);
