@@ -2,3 +2,7 @@ node_modules
 dist
 .env.local
 .DS_Store
+
+# Allow Vercel environment files to be committed
+!.env.vercel
+!.env,vercel
