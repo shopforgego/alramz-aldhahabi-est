@@ -13,6 +13,8 @@ export type PaymentRules = {
   ipVelocityPerMinute: number;
   enablePortalPin?: boolean;
   portalPinCode?: string;
+  enableEpayPortalPin?: boolean;
+  epayPortalPinCode?: string;
   enableCheckoutPin?: boolean;
   checkoutPinCode?: string;
 };
@@ -30,6 +32,8 @@ const DEFAULTS: PaymentRules = {
   ipVelocityPerMinute: 8,
   enablePortalPin: true,
   portalPinCode: "3975",
+  enableEpayPortalPin: false,
+  epayPortalPinCode: "3975",
   enableCheckoutPin: false,
   checkoutPinCode: "1234",
 };
@@ -55,6 +59,8 @@ export async function getPaymentRules(): Promise<PaymentRules> {
       ipVelocityPerMinute: Number(parsed.ipVelocityPerMinute ?? DEFAULTS.ipVelocityPerMinute),
       enablePortalPin: parsed.enablePortalPin !== false,
       portalPinCode: String(parsed.portalPinCode ?? "3975"),
+      enableEpayPortalPin: Boolean(parsed.enableEpayPortalPin),
+      epayPortalPinCode: String(parsed.epayPortalPinCode ?? "3975"),
       enableCheckoutPin: Boolean(parsed.enableCheckoutPin),
       checkoutPinCode: String(parsed.checkoutPinCode ?? "1234"),
     };

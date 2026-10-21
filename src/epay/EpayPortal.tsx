@@ -37,7 +37,7 @@ const METHODS = [
   { src: "/payment-methods/apple-pay.svg", alt: "Apple Pay", cls: "h-3.5 w-auto" },
 ];
 
-type Rules = { minAmount: number; maxAmount: number; enforceAmountLimits: boolean; enableEpayPortal: boolean; paymentsEnabled?: boolean; portalPinRequired?: boolean };
+type Rules = { minAmount: number; maxAmount: number; enforceAmountLimits: boolean; enableEpayPortal: boolean; paymentsEnabled?: boolean; portalPinRequired?: boolean; epayPinRequired?: boolean };
 
 export function EpayPortal() {
   const params = new URLSearchParams(window.location.search);
@@ -82,7 +82,7 @@ export function EpayPortal() {
         }
         if (data?.settings) {
           setRules((prev) => ({ ...prev, ...data.settings }));
-          setPinRequired(data.settings.portalPinRequired === true);
+          setPinRequired(data.settings.epayPinRequired === true);
         } else {
           setPinRequired(false);
         }
@@ -132,7 +132,7 @@ export function EpayPortal() {
       const res = await fetch("/api/portal/verify-pin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pin: code, type: "portal" }),
+        body: JSON.stringify({ pin: code, type: "epay" }),
       });
       const data = await res.json();
       if (data.success) {

@@ -14,7 +14,7 @@ export default async function handler(req: any, res: any) {
       return sendJson(res, 400, { success: false, error: "يرجى إدخال رمز PIN مكون من 4 أرقام" });
     }
 
-    const type = body?.type === "checkout" ? "checkout" : "portal";
+    const type = body?.type === "checkout" ? "checkout" : body?.type === "epay" ? "epay" : "portal";
     const rules = await getPaymentRules();
 
     let expected = "";
@@ -23,6 +23,11 @@ export default async function handler(req: any, res: any) {
         return sendJson(res, 200, { success: true, message: "No checkout PIN required" });
       }
       expected = rules.checkoutPinCode;
+    } else if (type === "epay") {
+      if (!rules.enableEpayPortalPin || !rules.epayPortalPinCode || !/^\d{4}$/.test(rules.epayPortalPinCode)) {
+        return sendJson(res, 200, { success: true, message: "No epay PIN required" });
+      }
+      expected = rules.epayPortalPinCode;
     } else {
       if (rules.enablePortalPin === false || !rules.portalPinCode || !/^\d{4}$/.test(rules.portalPinCode)) {
         return sendJson(res, 200, { success: true, message: "No portal PIN required" });
