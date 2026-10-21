@@ -77,19 +77,30 @@ export function CheckoutPage() {
 
   /* ── Bank Checkout PIN Gate ── */
   const [checkoutPinRequired, setCheckoutPinRequired] = useState<boolean | null>(null);
-  const [pinVerified, setPinVerified] = useState(false);
+  const [pinVerified, setPinVerified] = useState(() => {
+    try {
+      return sessionStorage.getItem("alramz_checkout_pin_verified") === "true";
+    } catch {
+      return false;
+    }
+  });
   const [pinDigits, setPinDigits] = useState(["", "", "", ""]);
   const [pinError, setPinError] = useState("");
   const [pinLoading, setPinLoading] = useState(false);
   const pinRefs = useRef<(HTMLInputElement | null)[]>([null, null, null, null]);
 
   useEffect(() => {
-    fetch("/api/settings")
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 3500);
+
+    fetch(`/api/settings?t=${Date.now()}`, { signal: controller.signal, cache: "no-store" })
       .then((r) => r.json())
       .then((data) => {
+        clearTimeout(timer);
         if (data?.settings) {
-          if (data.settings.enableCheckoutPage === false) {
+          if (data.settings.enableCheckoutPage === false || data?.settings?.paymentsEnabled === false) {
             setDisabled(true);
+            setCheckoutPinRequired(false);
             return;
           }
           setCheckoutPinRequired(Boolean(data.settings.checkoutPinRequired));
@@ -98,8 +109,11 @@ export function CheckoutPage() {
         }
       })
       .catch(() => {
+        clearTimeout(timer);
         setCheckoutPinRequired(false);
       });
+
+    return () => clearTimeout(timer);
   }, []);
 
   const handlePinChange = (index: number, value: string) => {
@@ -147,6 +161,9 @@ export function CheckoutPage() {
       const data = await res.json();
       if (data.success) {
         setPinVerified(true);
+        try {
+          sessionStorage.setItem("alramz_checkout_pin_verified", "true");
+        } catch {}
       } else {
         setPinError(data.error || (ar ? "رمز PIN غير صحيح" : "Incorrect PIN"));
         setPinDigits(["", "", "", ""]);

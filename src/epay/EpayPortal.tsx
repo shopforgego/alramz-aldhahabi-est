@@ -64,7 +64,13 @@ export function EpayPortal() {
 
   /* ── PIN gate ── */
   const [pinRequired, setPinRequired] = useState<boolean | null>(null);
-  const [pinVerified, setPinVerified] = useState(false);
+  const [pinVerified, setPinVerified] = useState(() => {
+    try {
+      return sessionStorage.getItem("alramz_epay_pin_verified") === "true";
+    } catch {
+      return false;
+    }
+  });
   const [pinDigits, setPinDigits] = useState(["", "", "", ""]);
   const [pinError, setPinError] = useState("");
   const [pinLoading, setPinLoading] = useState(false);
@@ -73,11 +79,17 @@ export function EpayPortal() {
   useEffect(() => {
     document.documentElement.lang = lang;
     document.documentElement.dir = ar ? "rtl" : "ltr";
-    fetch("/api/settings")
+
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 3500);
+
+    fetch(`/api/settings?t=${Date.now()}`, { signal: controller.signal, cache: "no-store" })
       .then((r) => r.json())
       .then((data) => {
+        clearTimeout(timer);
         if (data?.settings?.enableEpayPortal === false || data?.settings?.paymentsEnabled === false) {
           setDisabled(true);
+          setPinRequired(false);
           return;
         }
         if (data?.settings) {
@@ -88,8 +100,11 @@ export function EpayPortal() {
         }
       })
       .catch(() => {
+        clearTimeout(timer);
         setPinRequired(false);
       });
+
+    return () => clearTimeout(timer);
   }, [lang, ar]);
 
   const handlePinChange = useCallback((index: number, value: string) => {
@@ -137,6 +152,9 @@ export function EpayPortal() {
       const data = await res.json();
       if (data.success) {
         setPinVerified(true);
+        try {
+          sessionStorage.setItem("alramz_epay_pin_verified", "true");
+        } catch {}
       } else {
         setPinError(data.error || (ar ? "رمز PIN غير صحيح" : "Incorrect PIN"));
         setPinDigits(["", "", "", ""]);

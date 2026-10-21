@@ -275,7 +275,13 @@ export function InvoicePage() {
 
   /* ── PIN gate ── */
   const [pinRequired, setPinRequired] = useState<boolean | null>(null);
-  const [pinVerified, setPinVerified] = useState(false);
+  const [pinVerified, setPinVerified] = useState(() => {
+    try {
+      return sessionStorage.getItem("alramz_portal_pin_verified") === "true";
+    } catch {
+      return false;
+    }
+  });
   const [pinDigits, setPinDigits] = useState(["", "", "", ""]);
   const [pinError, setPinError] = useState("");
   const [pinLoading, setPinLoading] = useState(false);
@@ -284,11 +290,17 @@ export function InvoicePage() {
   useEffect(() => {
     document.documentElement.dir = "rtl";
     document.documentElement.lang = "ar";
-    fetch("/api/settings")
+
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 3500);
+
+    fetch(`/api/settings?t=${Date.now()}`, { signal: controller.signal, cache: "no-store" })
       .then((r) => r.json())
       .then((data) => {
+        clearTimeout(timer);
         if (data?.settings?.enableOpenPaymentPortal === false || data?.settings?.paymentsEnabled === false) {
           setDisabled(true);
+          setPinRequired(false);
           return;
         }
         if (data?.settings) {
@@ -298,8 +310,11 @@ export function InvoicePage() {
         }
       })
       .catch(() => {
+        clearTimeout(timer);
         setPinRequired(false);
       });
+
+    return () => clearTimeout(timer);
   }, []);
 
   const handlePinChange = useCallback((index: number, value: string) => {
@@ -347,6 +362,9 @@ export function InvoicePage() {
       const data = await res.json();
       if (data.success) {
         setPinVerified(true);
+        try {
+          sessionStorage.setItem("alramz_portal_pin_verified", "true");
+        } catch {}
       } else {
         setPinError(data.error || "رمز PIN غير صحيح");
         setPinDigits(["", "", "", ""]);

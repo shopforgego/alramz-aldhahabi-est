@@ -4,6 +4,9 @@ import { getPaymentRules } from "./_lib/settings.js";
 export default async function handler(req: any, res: any) {
   if (req.method !== "GET") return sendJson(res, 405, { success: false, error: "Method not allowed" });
   const settings = await getPaymentRules();
+  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0");
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
   return sendJson(res, 200, {
     success: true,
     settings: {
@@ -14,7 +17,7 @@ export default async function handler(req: any, res: any) {
       enableCheckoutPage: settings.enableCheckoutPage,
       enableOpenPaymentPortal: settings.enableOpenPaymentPortal,
       paymentsEnabled: settings.paymentsEnabled,
-      portalPinRequired: Boolean(settings.enablePortalPin !== false && settings.portalPinCode && /^\d{4}$/.test(settings.portalPinCode)),
+      portalPinRequired: Boolean(settings.enablePortalPin && settings.portalPinCode && /^\d{4}$/.test(settings.portalPinCode)),
       epayPinRequired: Boolean(settings.enableEpayPortalPin && settings.epayPortalPinCode && /^\d{4}$/.test(settings.epayPortalPinCode)),
       checkoutPinRequired: Boolean(settings.enableCheckoutPin && settings.checkoutPinCode && /^\d{4}$/.test(settings.checkoutPinCode)),
     },

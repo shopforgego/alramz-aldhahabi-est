@@ -38,12 +38,21 @@ const DEFAULTS: PaymentRules = {
   checkoutPinCode: "1234",
 };
 
+function withTimeout<T>(promise: Promise<T>, ms: number, fallback: T): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((resolve) => setTimeout(() => resolve(fallback), ms)),
+  ]);
+}
+
 export async function getPaymentRules(): Promise<PaymentRules> {
   try {
-    const res = await dbQuery(
-      "SELECT value FROM system_settings WHERE key = 'payment_rules' LIMIT 1"
+    const res = await withTimeout(
+      dbQuery("SELECT value FROM system_settings WHERE key = 'payment_rules' LIMIT 1"),
+      2500,
+      { rows: [] } as any
     );
-    const parsed = res.rows[0]?.value || {};
+    const parsed = res?.rows?.[0]?.value || {};
     return {
       ...DEFAULTS,
       ...parsed,
@@ -57,7 +66,7 @@ export async function getPaymentRules(): Promise<PaymentRules> {
       enableCheckoutPage: parsed.enableCheckoutPage !== false,
       enableEpayPortal: parsed.enableEpayPortal !== false,
       ipVelocityPerMinute: Number(parsed.ipVelocityPerMinute ?? DEFAULTS.ipVelocityPerMinute),
-      enablePortalPin: parsed.enablePortalPin !== false,
+      enablePortalPin: parsed.enablePortalPin !== undefined ? Boolean(parsed.enablePortalPin) : DEFAULTS.enablePortalPin,
       portalPinCode: String(parsed.portalPinCode ?? "3975"),
       enableEpayPortalPin: Boolean(parsed.enableEpayPortalPin),
       epayPortalPinCode: String(parsed.epayPortalPinCode ?? "3975"),
